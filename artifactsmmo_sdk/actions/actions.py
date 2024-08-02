@@ -188,7 +188,7 @@ class Actions:
     ) -> BankItemResponseSchema:
         """Take an item from your bank and put it in the character's inventory."""
         response = self.session.post(
-            url=f"{self.api_url}/my/{name}/action/bank/deposit",
+            url=f"{self.api_url}/my/{name}/action/bank/withdraw",
             json={
                 "code": code,
                 "quantity": quantity,
