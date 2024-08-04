@@ -17,3 +17,14 @@ def test_get_map():
 
     assert result
     ic(result)
+
+
+def test_get_all_maps():
+    """Tests."""
+    result = artifacts_client.maps.get_all_maps(
+        content_code="ogre",
+        content_type="monster",
+    )
+
+    assert result
+    ic(result)

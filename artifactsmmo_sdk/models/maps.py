@@ -1,6 +1,6 @@
 """Maps Schemas."""
 
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -23,3 +23,13 @@ class MapResponseSchema(BaseModel):
     """Map Response Schema."""
 
     data: MapSchema
+
+
+class ListMapResponseSchema(BaseModel):
+    """List Map Response Schema."""
+
+    data: List[MapSchema]
+    total: int
+    page: int
+    size: int
+    pages: int
