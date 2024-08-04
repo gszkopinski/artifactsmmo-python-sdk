@@ -38,7 +38,7 @@ class Characters:
         """Create a character."""
         response = self.session.post(
             url=f"{self.api_url}/characters/create",
-            body={"name": name, "skin": skin},
+            json={"name": name, "skin": skin},
         )
 
         response.raise_for_status()

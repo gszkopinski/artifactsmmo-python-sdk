@@ -206,7 +206,7 @@ class Actions:
     ) -> BankItemResponseSchema:
         """Withdraw gold from your bank."""
         response = self.session.post(
-            url=f"{self.api_url}/my/{name}/action/bank/deposit/gold",
+            url=f"{self.api_url}/my/{name}/action/bank/withdraw/gold",
             json={
                 "quantity": quantity,
             },
