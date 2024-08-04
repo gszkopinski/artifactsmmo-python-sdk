@@ -378,7 +378,7 @@ class TaskRewardDataSchema(BaseModel):
     """Task Reward Data Schema."""
 
     cooldown: CooldownSchema
-    task: TaskRewardSchema
+    reward: TaskRewardSchema
     character: CharacterSchema
 
 
