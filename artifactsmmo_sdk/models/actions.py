@@ -414,7 +414,6 @@ class DeleteItemResponseSchema(BaseModel):
 # LOGS
 # ---------------------------------------------------------
 
-
 # Logs Schema
 class LogsSchema(BaseModel):
     """Logs Schema."""
@@ -438,3 +437,14 @@ class LogsResponseSchema(BaseModel):
     page: int
     size: int
     pages: int
+
+
+# ---------------------------------------------------------
+# CHARACTERS
+# ---------------------------------------------------------
+
+# Characters Response Schema
+class CharactersResponseSchema(BaseModel):
+    """Characters Response Schema."""
+
+    data: List[CharacterSchema]

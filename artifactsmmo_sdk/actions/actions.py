@@ -15,6 +15,7 @@ from ..models.actions import (
     SkillDataSchema,
     TaskDataResponseSchema,
     TaskRewardDataResponseSchema,
+    CharactersResponseSchema,
 )
 
 
@@ -316,17 +317,32 @@ class Actions:
 
         return DeleteItemResponseSchema.model_validate(response.json())
 
-    def get_character_logs(
+    def get_all_character_logs(
         self,
         name: str,
         page: int = 1,
         size: int = 50,
     ) -> LogsResponseSchema:
-        """Get character logs."""
+        """Get all character logs."""
+        parameters = f"&page={page}"
+        parameters += f"&size={size}"
+
         response = response = self.session.get(
-            url=f"{self.api_url}/my/{name}/logs?page={page},size={size}",
+            url=f"{self.api_url}/my/{name}/logs?{parameters}",
         )
 
         response.raise_for_status()
 
         return LogsResponseSchema.model_validate(response.json())
+
+    def get_my_characters(
+        self,
+    ) -> CharactersResponseSchema:
+        """List of your characters."""
+        response = response = self.session.get(
+            url=f"{self.api_url}/my/characters",
+        )
+
+        response.raise_for_status()
+
+        return CharactersResponseSchema.model_validate(response.json())

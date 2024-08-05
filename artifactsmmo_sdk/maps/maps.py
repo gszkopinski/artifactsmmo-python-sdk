@@ -38,8 +38,12 @@ class Maps:
         page: int = 1,
         size: int = 50,
     ) -> ListMapResponseSchema:
-        """Return a map."""
-        parameters = f"content_code={content_code}&content_type={content_type}&page={page}&size={size}"
+        """Return maps."""
+        parameters = f"content_code={content_code}"
+        parameters += f"&content_type={content_type}"
+        parameters += f"&page={page}"
+        parameters += f"&size={size}"
+
         response = self.session.get(
             url=f"{self.api_url}/maps?{parameters}",
         )

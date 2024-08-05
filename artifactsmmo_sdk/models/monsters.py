@@ -31,3 +31,13 @@ class MonsterResponseSchema(BaseModel):
     """Monster Response Model."""
 
     data: MonsterSchema
+
+
+class ListMonsterResponseSchema(BaseModel):
+    """List Monster Response Schema."""
+
+    data: List[MonsterSchema]
+    total: int
+    page: int
+    size: int
+    pages: int

@@ -15,6 +15,7 @@ from .items import Items
 from .maps import Maps
 from .monsters import Monsters
 from .resources import Resources
+from .models.status import StatusReponseSchema
 
 
 load_dotenv()
@@ -77,3 +78,15 @@ class ArtifactsClient:
             api_url=self.api_url,
             session=self.session,
         )
+
+    def status(
+        self,
+    ) -> StatusReponseSchema:
+        """Return the status of the game server."""
+        response = self.session.get(
+            url=f"{self.api_url}/",
+        )
+
+        response.raise_for_status()
+
+        return StatusReponseSchema.model_validate(response.json())

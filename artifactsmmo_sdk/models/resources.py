@@ -21,3 +21,13 @@ class ResourceResponseSchema(BaseModel):
     """Resource Response Model."""
 
     data: ResourceSchema
+
+
+class ListResourceResponseSchema(BaseModel):
+    """List Resource Response Schema."""
+
+    data: List[ResourceSchema]
+    total: int
+    page: int
+    size: int
+    pages: int
