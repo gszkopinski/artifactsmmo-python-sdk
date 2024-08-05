@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.1.0 (2024-08-05)
+
+### Feature
+
+* feat: Upgrade to  API 1.4 ([`8aeec6b`](https://github.com/gszkopinski/artifactsmmo-python-sdk/commit/8aeec6b93dce2f66774c92c36da508f64f769202))
+
 ## v0.0.2 (2024-08-04)
 
 ### Fix
