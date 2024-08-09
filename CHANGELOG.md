@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.2.1 (2024-08-09)
+
+### Fix
+
+* fix(actions/unequip): Wrong message for 491 error ([`ad86118`](https://github.com/gszkopinski/artifactsmmo-python-sdk/commit/ad86118578f69ffcadad3129ae24ea6585083832))
+
 ## v0.2.0 (2024-08-09)
 
 ### Feature
