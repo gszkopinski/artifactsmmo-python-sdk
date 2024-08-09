@@ -1,10 +1,19 @@
 """Resources Models."""
 
+from enum import Enum
 from typing import List
 
 from pydantic import BaseModel
 
 from .common import DropRateSchema
+
+
+class SkillEnum(str, Enum):
+    """Skill Enum."""
+
+    MINING = "mining"
+    WOODCUTTING = "woodcutting"
+    FISHING = "fishing"
 
 
 class ResourceSchema(BaseModel):

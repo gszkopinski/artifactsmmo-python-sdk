@@ -1,10 +1,16 @@
 """Items Schemas."""
 
-from typing import Optional
+from enum import Enum
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 from .actions import ItemSchema
+
+
+# ---------------------------------------------------------
+# GET ITEM
+# ---------------------------------------------------------
 
 
 # Item Content Schema
@@ -30,3 +36,44 @@ class SingleItemResponseSchema(BaseModel):
     """Single Item Response Schema."""
 
     data: SingleItemSchema
+
+
+# ---------------------------------------------------------
+# GET ALL ITEMS
+# ---------------------------------------------------------
+
+
+class CraftSkillEnum(str, Enum):
+    """Craft Skill Enum."""
+
+    WEAPONCRAFTING = "weaponcrafting"
+    GEARCRAFTING = "gearcrafting"
+    JEWELRYCRAFTING = "jewelrycrafting"
+    COOKING = "cooking"
+    WOODCUTTING = "woodcutting"
+    MINING = "mining"
+
+
+# Type Item Enum
+class TypeItemEnum(str, Enum):
+    """Type Item Enum."""
+
+    WEAPON = "weapon"
+    SHIELD = "shield"
+    HELMET = "helmet"
+    BODY_ARMOR = "body_armor"
+    LEG_ARMOR = "leg_armor"
+    BOOTS = "boots"
+    RING = "ring"
+    AMULET = "amulet"
+    CONSUMABLE = "consumable"
+
+
+class ListItemsResponseSchema(BaseModel):
+    """List Items Response Schema."""
+
+    data: List[ItemSchema]
+    total: int
+    page: int
+    size: int
+    pages: int

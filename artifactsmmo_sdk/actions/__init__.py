@@ -1,4 +1,4 @@
-"""Init Characters."""
+"""Init Actions."""
 
 from .actions import Actions
 

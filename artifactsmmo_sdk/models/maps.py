@@ -1,10 +1,22 @@
 """Maps Schemas."""
 
+from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel
 
 from .common import MapContentSchema
+
+
+class MapContentTypeSchema(str, Enum):
+    """Map Content Type Schema."""
+
+    MONSTER = "monster"
+    RESOURCE = "resource"
+    WORKSHOP = "workshop"
+    BANK = "bank"
+    GRAND_EXCHANGE = "grand_exchange"
+    TASKS_MASTER = "tasks_master"
 
 
 # Map Schema

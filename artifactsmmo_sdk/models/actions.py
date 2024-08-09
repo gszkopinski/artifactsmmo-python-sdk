@@ -1,7 +1,7 @@
 """Characters Schemas."""
 
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from pydantic import BaseModel
 
@@ -46,7 +46,7 @@ class DropSchema(BaseModel):
 
 
 # Skill Infos Schema
-class SkillInfosSchema(BaseModel):
+class SkillInfoSchema(BaseModel):
     """Skill Infos Schema."""
 
     xp: int
@@ -59,7 +59,7 @@ class SkillInfosSchema(BaseModel):
 
 
 # Destination Schema
-class DestinationSchema(BaseModel):
+class MapSchema(BaseModel):
     """Destination Schema."""
 
     name: str
@@ -69,19 +69,19 @@ class DestinationSchema(BaseModel):
 
 
 # Action Move Schema
-class ActionMoveSchema(BaseModel):
+class CharacterMovementDataSchema(BaseModel):
     """Action Move Schema."""
 
     cooldown: CooldownSchema
-    destination: DestinationSchema
+    destination: MapSchema
     character: CharacterSchema
 
 
 # Action Move Response Schema
-class ActionMoveResponseSchema(BaseModel):
+class CharacterMovementDataResponseSchema(BaseModel):
     """Action Move Response Schema."""
 
-    data: ActionMoveSchema
+    data: CharacterMovementDataSchema
 
 
 # ---------------------------------------------------------
@@ -150,7 +150,7 @@ class ItemSchema(BaseModel):
 
 
 # Action Equip Item Schema
-class ActionEquipItemSchema(BaseModel):
+class EquipRequestSchema(BaseModel):
     """Action Equip Item Schema."""
 
     cooldown: CooldownSchema
@@ -160,10 +160,10 @@ class ActionEquipItemSchema(BaseModel):
 
 
 # Action Equip Item Response Schema
-class ActionEquipItemResponseSchema(BaseModel):
+class EquipRequestResponseSchema(BaseModel):
     """Action Equip Item Response Schema."""
 
-    data: ActionEquipItemSchema
+    data: EquipRequestSchema
 
 
 # ---------------------------------------------------------
@@ -205,7 +205,7 @@ class FightSchema(BaseModel):
 
 
 # Action Fight Schema
-class ActionFightSchema(BaseModel):
+class CharacterFightDataSchema(BaseModel):
     """Action Fight Schema."""
 
     cooldown: CooldownSchema
@@ -214,10 +214,10 @@ class ActionFightSchema(BaseModel):
 
 
 # Action Fight Response Schema
-class ActionFightResponseSchema(BaseModel):
+class CharacterFightDataResponseSchema(BaseModel):
     """Action Fight Response Schema."""
 
-    data: ActionFightSchema
+    data: CharacterFightDataSchema
 
 
 # ---------------------------------------------------------
@@ -226,19 +226,19 @@ class ActionFightResponseSchema(BaseModel):
 
 
 # Action Gathering Schema
-class SkillInfoSchema(BaseModel):
+class SkillDataSchema(BaseModel):
     """Action Gathering Schema."""
 
     cooldown: CooldownSchema
-    details: SkillInfosSchema
+    details: SkillInfoSchema
     character: CharacterSchema
 
 
 # Action Gathering Response Schema
-class SkillDataSchema(BaseModel):
+class SkillDataResponseSchema(BaseModel):
     """Action Gathering Response Schema."""
 
-    data: SkillInfoSchema
+    data: SkillDataSchema
 
 
 # ---------------------------------------------------------
@@ -261,6 +261,16 @@ class BankItemResponseSchema(BaseModel):
     """Bank Item Response Schema."""
 
     data: BankItemSchema
+
+
+class ListBankItemsResponseSchema(BaseModel):
+    """List Bank Items Response Schema."""
+
+    data: List[SimpleItemSchema]
+    total: int
+    page: int
+    size: int
+    pages: int
 
 
 # ---------------------------------------------------------
@@ -290,6 +300,40 @@ class GoldTransactionResponseSchema(BaseModel):
     """Gold Transaction Response Schema."""
 
     data: GoldTransactionSchema
+
+
+class ListBankGoldsResponseSchema(BaseModel):
+    """List Bank Golds Response Schema."""
+
+    data: GoldSchema
+
+
+# ---------------------------------------------------------
+# RECYCLING
+# ---------------------------------------------------------
+
+
+# Recycling Items Schema
+class RecyclingItemsSchema(BaseModel):
+    """Recycling Items Schema."""
+
+    items: List[DropSchema]
+
+
+# Recycling Data Schema
+class RecyclingDataSchema(BaseModel):
+    """Recycling Data Schema."""
+
+    cooldown: CooldownSchema
+    details: RecyclingItemsSchema
+    character: CharacterSchema
+
+
+# Recycling Data Response Schema
+class RecyclingDataResponseSchema(BaseModel):
+    """Recycling Data Response Schema."""
+
+    data: RecyclingDataSchema
 
 
 # ---------------------------------------------------------
@@ -414,6 +458,7 @@ class DeleteItemResponseSchema(BaseModel):
 # LOGS
 # ---------------------------------------------------------
 
+
 # Logs Schema
 class LogsSchema(BaseModel):
     """Logs Schema."""
@@ -422,7 +467,7 @@ class LogsSchema(BaseModel):
     account: str
     type: str
     description: str
-    content: str
+    content: Any
     cooldown: int
     cooldown_expiration: str
     created_at: str
@@ -443,8 +488,18 @@ class LogsResponseSchema(BaseModel):
 # CHARACTERS
 # ---------------------------------------------------------
 
+
 # Characters Response Schema
 class CharactersResponseSchema(BaseModel):
     """Characters Response Schema."""
 
     data: List[CharacterSchema]
+
+
+# ---------------------------------------------------------
+# PASSWORD
+# ---------------------------------------------------------
+class ChangePasswordResponseSchema(BaseModel):
+    """ChangePasswordResponseSchema."""
+
+    message: str

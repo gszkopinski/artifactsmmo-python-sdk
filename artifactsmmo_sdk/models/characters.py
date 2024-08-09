@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 # Character Skin Enum
 class CharacterSkinEnum(str, Enum):
-    """Character Inventory Model."""
+    """Character Skin Enum."""
 
     MEN1 = "men1"
     MEN2 = "men2"
@@ -16,6 +16,20 @@ class CharacterSkinEnum(str, Enum):
     WOMEN1 = "women1"
     WOMEN2 = "women2"
     WOMEN3 = "women3"
+
+
+# Character Skin Enum
+class CharacterSortEnum(str, Enum):
+    """Character Sort Enum."""
+
+    WEAPONCRAFTING = "weaponcrafting"
+    GEARCRAFTING = "gearcrafting"
+    JEWELRYCRAFTING = "jewelrycrafting"
+    COOKING = "cooking"
+    WOODCUTTING = "woodcutting"
+    MINING = "mining"
+    GOLD = "gold"
+    XP = "xp"
 
 
 # Character Inventory Model
@@ -102,50 +116,19 @@ class CharacterSchema(BaseModel):
     task_total: int
     inventory_max_items: int
     inventory: List[CharacterInventorySchema]
-    # DEPRECATED
-    # inventory_slot1: str
-    # inventory_slot1_quantity: int
-    # inventory_slot2: str
-    # inventory_slot2_quantity: int
-    # inventory_slot3: str
-    # inventory_slot3_quantity: int
-    # inventory_slot4: str
-    # inventory_slot4_quantity: int
-    # inventory_slot5: str
-    # inventory_slot5_quantity: int
-    # inventory_slot6: str
-    # inventory_slot6_quantity: int
-    # inventory_slot7: str
-    # inventory_slot7_quantity: int
-    # inventory_slot8: str
-    # inventory_slot8_quantity: int
-    # inventory_slot9: str
-    # inventory_slot9_quantity: int
-    # inventory_slot10: str
-    # inventory_slot10_quantity: int
-    # inventory_slot11: str
-    # inventory_slot11_quantity: int
-    # inventory_slot12: str
-    # inventory_slot12_quantity: int
-    # inventory_slot13: str
-    # inventory_slot13_quantity: int
-    # inventory_slot14: str
-    # inventory_slot14_quantity: int
-    # inventory_slot15: str
-    # inventory_slot15_quantity: int
-    # inventory_slot16: str
-    # inventory_slot16_quantity: int
-    # inventory_slot17: str
-    # inventory_slot17_quantity: int
-    # inventory_slot18: str
-    # inventory_slot18_quantity: int
-    # inventory_slot19: str
-    # inventory_slot19_quantity: int
-    # inventory_slot20: str
-    # inventory_slot20_quantity: int
 
 
 class CharacterResponseSchema(BaseModel):
     """Character Response Model."""
 
     data: CharacterSchema
+
+
+class ListCharacterResponseSchema(BaseModel):
+    """List Character Response Schema."""
+
+    data: List[CharacterSchema]
+    total: int
+    page: int
+    size: int
+    pages: int

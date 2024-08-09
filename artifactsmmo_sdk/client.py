@@ -9,13 +9,15 @@ import requests
 
 from dotenv import load_dotenv
 
+from .account import Account
 from .actions import Actions
 from .characters import Characters
+from .events import Events
 from .items import Items
 from .maps import Maps
+from .models.status import StatusReponseSchema
 from .monsters import Monsters
 from .resources import Resources
-from .models.status import StatusReponseSchema
 
 
 load_dotenv()
@@ -49,12 +51,22 @@ class ArtifactsClient:
             },
         )
 
+        self.account = Account(
+            api_url=self.api_url,
+            session=self.session,
+        )
+
         self.actions = Actions(
             api_url=self.api_url,
             session=self.session,
         )
 
         self.characters = Characters(
+            api_url=self.api_url,
+            session=self.session,
+        )
+
+        self.events = Events(
             api_url=self.api_url,
             session=self.session,
         )
