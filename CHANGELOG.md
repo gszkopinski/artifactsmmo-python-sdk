@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.2.0 (2024-08-09)
+
+### Feature
+
+* feat: Return error and object for each function ([`9d47dc2`](https://github.com/gszkopinski/artifactsmmo-python-sdk/commit/9d47dc2efd6148c7e5a3cec159ed3d34357387bb))
+
 ## v0.1.0 (2024-08-05)
 
 ### Feature
