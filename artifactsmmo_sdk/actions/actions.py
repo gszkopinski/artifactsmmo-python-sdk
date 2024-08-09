@@ -146,7 +146,7 @@ class Actions:
                 case 486:
                     return "Character is locked. Action is already in progress.", None
                 case 491:
-                    return "Slot is not empty.", None
+                    return "Slot is empty.", None
                 case 497:
                     return "Character inventory is full.", None
                 case 498:
