@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.2.2 (2024-08-30)
+
+### Fix
+
+* fix(maps): Add default value if content type or content code are empty ([`1ec7eca`](https://github.com/gszkopinski/artifactsmmo-python-sdk/commit/1ec7ecab6ef9c08be739fc6822aebb6a6db28036))
+
 ## v0.2.1 (2024-08-09)
 
 ### Fix
