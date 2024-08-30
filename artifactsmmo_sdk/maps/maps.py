@@ -58,9 +58,9 @@ class Maps:
     ) -> Tuple[str, ListMapResponseSchema | None]:
         """Fetch maps details."""
         try:
-            parameters = f"&page={page}"
+            parameters = f"page={page}"
             parameters += f"&size={size}"
-            parameters += f"content_code={content_code}" if content_code else ""
+            parameters += f"&content_code={content_code}" if content_code else ""
             parameters += f"&content_type={content_type}" if content_type else ""
 
             response = self.session.get(
