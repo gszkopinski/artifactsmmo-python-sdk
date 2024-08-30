@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.2.3 (2024-08-30)
+
+### Fix
+
+* fix(maps): fix parameters for get_all_maps ([`a80d571`](https://github.com/gszkopinski/artifactsmmo-python-sdk/commit/a80d5712fdba8f6a357eefdad4e2da44f1603fef))
+
 ## v0.2.2 (2024-08-30)
 
 ### Fix
