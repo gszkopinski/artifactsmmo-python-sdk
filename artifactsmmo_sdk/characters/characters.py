@@ -59,30 +59,6 @@ class Characters:
                 case _:
                     return f"Unknown error: {error}", None
 
-    def get_character(
-        self,
-        name: str,
-    ) -> Tuple[str, CharacterResponseSchema | None]:
-        """Retrieve the details of a character."""
-        try:
-            response = self.session.get(
-                url=f"{self.api_url}/characters/{name}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched character.",
-                CharacterResponseSchema.model_validate(response.json())
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 404:
-                    return "Character not found.", None
-                case _:
-                    return f"Unknown error: {error}", None
-
     def delete_character(
         self,
         name: Annotated[str, Field(
@@ -143,5 +119,29 @@ class Characters:
             match error.response.status_code:
                 case 404:
                     return "Characters not found.", None
+                case _:
+                    return f"Unknown error: {error}", None
+
+    def get_character(
+        self,
+        name: str,
+    ) -> Tuple[str, CharacterResponseSchema | None]:
+        """Retrieve the details of a character."""
+        try:
+            response = self.session.get(
+                url=f"{self.api_url}/characters/{name}",
+            )
+
+            response.raise_for_status()
+
+            return (
+                "Successfully fetched character.",
+                CharacterResponseSchema.model_validate(response.json())
+            )
+
+        except requests.exceptions.HTTPError as error:
+            match error.response.status_code:
+                case 404:
+                    return "Character not found.", None
                 case _:
                     return f"Unknown error: {error}", None

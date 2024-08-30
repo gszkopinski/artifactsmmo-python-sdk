@@ -50,7 +50,7 @@ class CharacterSchema(BaseModel):
     level: int
     xp: int
     max_xp: int
-    total_xp: int
+    # total_xp: int
     gold: int
     speed: int
     mining_level: int

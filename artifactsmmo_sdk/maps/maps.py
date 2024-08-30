@@ -58,10 +58,10 @@ class Maps:
     ) -> Tuple[str, ListMapResponseSchema | None]:
         """Fetch maps details."""
         try:
-            parameters = f"content_code={content_code}"
-            parameters += f"&content_type={content_type}"
-            parameters += f"&page={page}"
+            parameters = f"&page={page}"
             parameters += f"&size={size}"
+            parameters += f"content_code={content_code}" if content_code else ""
+            parameters += f"&content_type={content_type}" if content_type else ""
 
             response = self.session.get(
                 url=f"{self.api_url}/maps?{parameters}",

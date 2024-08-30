@@ -1,18 +1,29 @@
 """Test characters."""
 
+from time import sleep
 from icecream import ic
 
 from artifactsmmo_sdk import ArtifactsClient
 
-from time import sleep
 
 artifacts_client = ArtifactsClient()
+
+
+def get_character_name():
+    """Get Character."""
+    error, character = artifacts_client.characters.get_character(
+        name="billy1",
+    )
+    if not character:
+        raise Exception(error)
+
+    return character.data.name
 
 
 def test_action_move():
     """Tests."""
     error, result = artifacts_client.actions.move(
-        name="billy1",
+        name=get_character_name(),
         x=0,
         y=1,
     )
@@ -29,7 +40,7 @@ def test_action_move():
 def test_action_move_back():
     """Tests."""
     error, result = artifacts_client.actions.move(
-        name="billy1",
+        name=get_character_name(),
         x=0,
         y=0,
     )
@@ -46,7 +57,7 @@ def test_action_move_back():
 def test_unequip_item():
     """Tests."""
     error, result = artifacts_client.actions.unequip_item(
-        name="billy1",
+        name=get_character_name(),
         slot="weapon",
     )
 
@@ -62,7 +73,7 @@ def test_unequip_item():
 def test_equip_item():
     """Tests."""
     error, result = artifacts_client.actions.equip_item(
-        name="billy1",
+        name=get_character_name(),
         code="wooden_stick",
         slot="weapon",
     )
@@ -81,7 +92,7 @@ def test_get_all_character_logs():
     error, result = artifacts_client.actions.get_all_character_logs()
 
     if not result:
-        print(ic(error))
+        print(error)
 
     else:
         assert result
@@ -91,7 +102,7 @@ def test_get_all_character_logs():
 
 def test_gathering():
     """Tests."""
-    error, result = artifacts_client.actions.gathering(name="billy1")
+    error, result = artifacts_client.actions.gathering(name=get_character_name())
 
     if not result:
         print(error)
