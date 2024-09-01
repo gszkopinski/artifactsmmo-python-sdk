@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.2.5 (2024-09-01)
+
+### Fix
+
+* fix(items): Wrong url ([`619b343`](https://github.com/gszkopinski/artifactsmmo-python-sdk/commit/619b343a5c77b233c04a83dc3fe651739bdecb87))
+
 ## v0.2.4 (2024-09-01)
 
 ### Fix
