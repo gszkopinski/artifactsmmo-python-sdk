@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.2.4 (2024-09-01)
+
+### Fix
+
+* fix: All things, fix optioanl parameters ([`bf250e6`](https://github.com/gszkopinski/artifactsmmo-python-sdk/commit/bf250e6c9ccbd3e8e009dbd2028b7303eda81e59))
+
 ## v0.2.3 (2024-08-30)
 
 ### Fix

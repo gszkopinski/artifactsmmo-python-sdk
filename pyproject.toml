@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "artifactsmmo-sdk"
-version = "0.2.3"
+version = "0.2.4"
 description = "Artifacts MMO SDK"
 authors = ["Guillaume SZKOPINSKI <gszkopinski@gmail.com>"]
 readme = "README.md"
