@@ -66,14 +66,14 @@ class Items:
     ) -> Tuple[str, ListItemsResponseSchema | None]:
         """Fetch monsters details."""
         try:
-            parameters = f"craft_material={craft_material}"
-            parameters += f"&craft_skill={craft_skill}"
-            parameters += f"&max_level={max_level}"
-            parameters += f"&min_level={min_level}"
-            parameters += f"&name={name}"
-            parameters += f"&page={page}"
+            parameters = f"page={page}"
             parameters += f"&size={size}"
             parameters += f"&type={type_item}"
+            parameters += f"&craft_material={craft_material}" if craft_material else ""
+            parameters += f"&craft_skill={craft_skill}" if craft_skill else ""
+            parameters += f"&max_level={max_level}" if max_level else ""
+            parameters += f"&min_level={min_level}" if min_level else ""
+            parameters += f"&name={name}" if name else ""
 
             response = self.session.get(
                 url=f"{self.api_url}/monsters?{parameters}",

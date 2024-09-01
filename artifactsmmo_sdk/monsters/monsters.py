@@ -55,11 +55,11 @@ class Monsters:
     ) -> Tuple[str, ListMonsterResponseSchema | None]:
         """Fetch monsters details."""
         try:
-            parameters = f"drop={drop}"
-            parameters += f"&max_level={max_level}"
-            parameters += f"&min_level={min_level}"
-            parameters += f"&page={page}"
+            parameters = f"page={page}"
             parameters += f"&size={size}"
+            parameters += f"&drop={drop}" if drop else ""
+            parameters += f"&max_level={max_level}" if max_level else ""
+            parameters += f"&min_level={min_level}" if min_level else ""
 
             response = self.session.get(
                 url=f"{self.api_url}/monsters?{parameters}",

@@ -60,12 +60,12 @@ class Resources:
     ) -> Tuple[str, ListResourceResponseSchema | None]:
         """Return resources."""
         try:
-            parameters = f"drop={drop}"
-            parameters += f"&max_level={max_level}"
-            parameters += f"&min_level={min_level}"
-            parameters += f"&skill={skill}"
-            parameters += f"&page={page}"
+            parameters = f"page={page}"
             parameters += f"&size={size}"
+            parameters += f"&drop={drop}" if drop else ""
+            parameters += f"&max_level={max_level}" if max_level else ""
+            parameters += f"&min_level={min_level}" if min_level else ""
+            parameters += f"&skill={skill}" if skill else ""
 
             response = self.session.get(
                 url=f"{self.api_url}/resources?{parameters}",
