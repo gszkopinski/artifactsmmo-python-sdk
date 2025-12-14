@@ -1,4 +1,4 @@
-"""Init Characters."""
+"""Init Account."""
 
 from .account import Account
 

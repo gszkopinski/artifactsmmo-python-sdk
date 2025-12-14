@@ -26,7 +26,9 @@ class GrandExchange:
 
     def get_ge_item(
         self,
-        code: Annotated[str, Field(description="The code of the item.", pattern="^[a-zA-Z0-9_-]+$")],
+        code: Annotated[
+            str, Field(description="The code of the item.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
     ) -> Tuple[str, GEItemResponseSchema | None]:
         """Retrieve the details of a Grand Exchange item.."""
         try:
@@ -38,7 +40,7 @@ class GrandExchange:
 
             return (
                 "Successfully fetched Grand Exchange item.",
-                GEItemResponseSchema.model_validate(response.json())
+                GEItemResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:
@@ -51,7 +53,9 @@ class GrandExchange:
     def get_all_ge_item(
         self,
         page: Annotated[int, Field(description="Page number.", ge=1, default=1)] = 1,
-        size: Annotated[int, Field(description="Page size.", ge=1, le=100, default=50)] = 50,
+        size: Annotated[
+            int, Field(description="Page size.", ge=1, le=100, default=50)
+        ] = 50,
     ) -> Tuple[str, ListActiveEventResponseSchema | None]:
         """Fetch Grand Exchange items details."""
         try:
@@ -66,7 +70,7 @@ class GrandExchange:
 
             return (
                 "Fetch Grand Exchange items details.",
-                ListActiveEventResponseSchema.model_validate(response.json())
+                ListActiveEventResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:

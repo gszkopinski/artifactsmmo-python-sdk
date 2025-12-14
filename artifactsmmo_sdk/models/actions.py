@@ -1,12 +1,12 @@
 """Characters Schemas."""
 
 from enum import Enum
-from typing import List, Optional, Any
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
 from .characters import CharacterSchema
-from .common import MapContentSchema
+from .common import MapContentSchema, SimpleItemSchema
 
 
 class CooldownReasonEnum(str, Enum):
@@ -18,13 +18,22 @@ class CooldownReasonEnum(str, Enum):
     GATHERING = "gathering"
     BUY_GE = "buy_ge"
     SELL_GE = "sell_ge"
+    BUY_NPC = "buy_npc"
+    SELL_NPC = "sell_npc"
+    CANCEL_GE = "cancel_ge"
     DELETE_ITEM = "delete_item"
-    DEPOSIT_BANK = "deposit_bank"
-    WITHDRAW_BANK = "withdraw_bank"
+    DEPOSIT = "deposit"
+    WITHDRAW = "withdraw"
+    DEPOSIT_GOLD = "deposit_gold"
+    WITHDRAW_GOLD = "withdraw_gold"
     EQUIP = "equip"
     UNEQUIP = "unequip"
     TASK = "task"
+    CHRISTMAS_EXCHANGE = "christmas_exchange"
     RECYCLING = "recycling"
+    REST = "rest"
+    USE = "use"
+    BUY_BANK_EXPANSION = "buy_bank_expansion"
 
 
 # Action Cooldown Schema
@@ -85,6 +94,63 @@ class CharacterMovementDataResponseSchema(BaseModel):
 
 
 # ---------------------------------------------------------
+# TRANSITION
+# ---------------------------------------------------------
+class ConditionSchema(BaseModel):
+    """Condition Schema."""
+
+    code: str
+    operator: str
+    value: Any
+
+
+class TransitionSchema(BaseModel):
+    """Transition Schema."""
+
+    map_id: int
+    x: int
+    y: int
+    layer: str
+    conditions: Optional[List[ConditionSchema]] = None
+
+
+class CharacterTransitionDataSchema(BaseModel):
+    """Action Transition Schema."""
+
+    cooldown: CooldownSchema
+    destination: MapSchema
+    transition: TransitionSchema
+    character: CharacterSchema
+
+
+class CharacterTransitionDataResponseSchema(BaseModel):
+    """Action Transition Response Schema."""
+
+    data: CharacterTransitionDataSchema
+
+
+# ---------------------------------------------------------
+# REST
+# ---------------------------------------------------------
+
+
+# Action Rest Schema
+class CharacterRestDataSchema(BaseModel):
+    """Action Rest Schema."""
+
+    cooldown: CooldownSchema
+    hp_restored: int
+    character: CharacterSchema
+
+
+# Action Rest Response Schema
+class CharacterRestDataResponseSchema(BaseModel):
+    """Action Rest Response Schema."""
+
+    data: CharacterRestDataSchema
+
+
+# ---------------------------------------------------------
 # EQUIP ITEM
 # ---------------------------------------------------------
 
@@ -113,16 +179,8 @@ class SlotEnum(str, Enum):
 class EffectSchema(BaseModel):
     """Effect Schema."""
 
-    name: str
-    value: int
-
-
-# Simple Item Schema
-class SimpleItemSchema(BaseModel):
-    """Simple Item Schema."""
-
     code: str
-    quantity: int
+    value: int
 
 
 # Craft Schema
@@ -147,6 +205,7 @@ class ItemSchema(BaseModel):
     description: str
     effects: List[EffectSchema]
     craft: Optional[CraftSchema]
+    tradeable: bool
 
 
 # Action Equip Item Schema
@@ -164,6 +223,20 @@ class EquipRequestResponseSchema(BaseModel):
     """Action Equip Item Response Schema."""
 
     data: EquipRequestSchema
+
+
+class UseItemSchema(BaseModel):
+    """Use Item Schema."""
+
+    cooldown: CooldownSchema
+    item: ItemSchema
+    character: CharacterSchema
+
+
+class UseItemResponseSchema(BaseModel):
+    """Use Item Response Schema."""
+
+    data: UseItemSchema
 
 
 # ---------------------------------------------------------
@@ -239,38 +312,6 @@ class SkillDataResponseSchema(BaseModel):
     """Action Gathering Response Schema."""
 
     data: SkillDataSchema
-
-
-# ---------------------------------------------------------
-# BANK ITEM
-# ---------------------------------------------------------
-
-
-# Bank Item Schema
-class BankItemSchema(BaseModel):
-    """Bank Item Response Schema."""
-
-    cooldown: CooldownSchema
-    item: ItemSchema
-    bank: List[SimpleItemSchema]
-    character: CharacterSchema
-
-
-# Bank Item Response Schema
-class BankItemResponseSchema(BaseModel):
-    """Bank Item Response Schema."""
-
-    data: BankItemSchema
-
-
-class ListBankItemsResponseSchema(BaseModel):
-    """List Bank Items Response Schema."""
-
-    data: List[SimpleItemSchema]
-    total: int
-    page: int
-    size: int
-    pages: int
 
 
 # ---------------------------------------------------------
@@ -469,7 +510,7 @@ class LogsSchema(BaseModel):
     description: str
     content: Any
     cooldown: int
-    cooldown_expiration: str
+    cooldown_expiration: Optional[str] = None
     created_at: str
 
 
@@ -497,9 +538,18 @@ class CharactersResponseSchema(BaseModel):
 
 
 # ---------------------------------------------------------
-# PASSWORD
+# BANK ITEM
 # ---------------------------------------------------------
-class ChangePasswordResponseSchema(BaseModel):
-    """ChangePasswordResponseSchema."""
+class BankItemSchema(BaseModel):
+    """Bank Item Response Schema."""
 
-    message: str
+    cooldown: CooldownSchema
+    item: ItemSchema
+    bank: List[SimpleItemSchema]
+    character: CharacterSchema
+
+
+class BankItemResponseSchema(BaseModel):
+    """Bank Item Response Schema."""
+
+    data: BankItemSchema

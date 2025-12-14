@@ -28,7 +28,9 @@ class Items:
 
     def get_item(
         self,
-        code: Annotated[str, Field(description="The code of the item.", pattern="^[a-zA-Z0-9_-]+$")],
+        code: Annotated[
+            str, Field(description="The code of the item.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
     ) -> Tuple[str, SingleItemResponseSchema | None]:
         """Retrieve the details of a item."""
         try:
@@ -40,7 +42,7 @@ class Items:
 
             return (
                 "Successfully fetched item.",
-                SingleItemResponseSchema.model_validate(response.json())
+                SingleItemResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:
@@ -52,17 +54,28 @@ class Items:
 
     def get_all_items(
         self,
-        craft_material: Annotated[str, Field(
-            description="Item code of items used as material for crafting.",
-            pattern="^[a-zA-Z0-9_-]+$",
-        )],
-        craft_skill: Annotated[CraftSkillEnum, Field(description="Skill to craft items.")],
+        craft_material: Annotated[
+            str,
+            Field(
+                description="Item code of items used as material for crafting.",
+                pattern="^[a-zA-Z0-9_-]+$",
+            ),
+        ],
+        craft_skill: Annotated[
+            CraftSkillEnum, Field(description="Skill to craft items.")
+        ],
         max_level: Annotated[int, Field(description="Monster maximum level.", ge=0)],
         min_level: Annotated[int, Field(description="Monster minimum level.", ge=0)],
-        name: Annotated[str, Field(description="Name of the item.", pattern="^[a-zA-Z0-9_-]+$")],
-        type_item: Annotated[TypeItemEnum, Field(description="Type of items.", alias="type")],
+        name: Annotated[
+            str, Field(description="Name of the item.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+        type_item: Annotated[
+            TypeItemEnum, Field(description="Type of items.", alias="type")
+        ],
         page: Annotated[int, Field(description="Page number.", ge=1, default=1)] = 1,
-        size: Annotated[int, Field(description="Page size.", ge=1, le=100, default=50)] = 50,
+        size: Annotated[
+            int, Field(description="Page size.", ge=1, le=100, default=50)
+        ] = 50,
     ) -> Tuple[str, ListItemsResponseSchema | None]:
         """Fetch items details."""
         try:
@@ -83,7 +96,7 @@ class Items:
 
             return (
                 "Fetch items details.",
-                ListItemsResponseSchema.model_validate(response.json())
+                ListItemsResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:

@@ -10,14 +10,16 @@ import requests
 from dotenv import load_dotenv
 
 from .account import Account
+from .accounts import Accounts
 from .actions import Actions
 from .characters import Characters
 from .events import Events
 from .items import Items
 from .maps import Maps
-from .models.status import StatusReponseSchema
 from .monsters import Monsters
 from .resources import Resources
+from .server import Server
+from .token import Token
 
 
 load_dotenv()
@@ -45,13 +47,18 @@ class ArtifactsClient:
         self.session = requests.Session()
         self.session.headers.update(
             {
-                "Accept": "Accept: application/json",
-                "Authorization": f"Bearer {self.token}",
+                "Accept": "application/json",
                 "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.token}",
             },
         )
 
         self.account = Account(
+            api_url=self.api_url,
+            session=self.session,
+        )
+
+        self.accounts = Accounts(
             api_url=self.api_url,
             session=self.session,
         )
@@ -91,14 +98,12 @@ class ArtifactsClient:
             session=self.session,
         )
 
-    def status(
-        self,
-    ) -> StatusReponseSchema:
-        """Return the status of the game server."""
-        response = self.session.get(
-            url=f"{self.api_url}/",
+        self.server = Server(
+            api_url=self.api_url,
+            session=self.session,
         )
 
-        response.raise_for_status()
-
-        return StatusReponseSchema.model_validate(response.json())
+        self.token = Token(
+            api_url=self.api_url,
+            session=self.session,
+        )

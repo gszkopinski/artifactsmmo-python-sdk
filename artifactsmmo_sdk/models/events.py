@@ -11,6 +11,7 @@ class ActiveEventSchema(BaseModel):
     """ActiveEventSchema."""
 
     name: str
+    code: str
     map: MapSchema
     previous_skin: str
     duration: int

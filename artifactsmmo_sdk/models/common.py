@@ -26,3 +26,11 @@ class PointOfInterest(BaseModel):
     x: int
     y: int
     description: str
+
+
+# Simple Item Schema
+class SimpleItemSchema(BaseModel):
+    """Simple Item Schema."""
+
+    code: str
+    quantity: int

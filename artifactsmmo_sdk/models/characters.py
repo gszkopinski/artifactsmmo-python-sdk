@@ -16,6 +16,9 @@ class CharacterSkinEnum(str, Enum):
     WOMEN1 = "women1"
     WOMEN2 = "women2"
     WOMEN3 = "women3"
+    CORRUPTED1 = "corrupted1"
+    ZOMBIE1 = "zombie1"
+    MARAUDER1 = "marauder1"
 
 
 # Character Skin Enum
@@ -41,11 +44,27 @@ class CharacterInventorySchema(BaseModel):
     quantity: int
 
 
+class StorageEffectSchema(BaseModel):
+    """Storage Effect Model."""
+
+    code: str
+    value: int
+
+
+class LayerEnum(str, Enum):
+    """Layer Enum."""
+
+    INTERIOR = "interior"
+    OVERWORLD = "overworld"
+    UNDERGROUND = "underground"
+
+
 # Character Model
 class CharacterSchema(BaseModel):
     """Character Model."""
 
     name: str
+    account: str
     skin: CharacterSkinEnum
     level: int
     xp: int
@@ -74,14 +93,22 @@ class CharacterSchema(BaseModel):
     cooking_level: int
     cooking_xp: int
     cooking_max_xp: int
+    alchemy_level: int
+    alchemy_xp: int
+    alchemy_max_xp: int
     hp: int
+    max_hp: int
     haste: int
     critical_strike: int
-    stamina: int
+    wisdom: int
+    prospecting: int
+    initiative: int
+    threat: int
     attack_fire: int
     attack_earth: int
     attack_water: int
     attack_air: int
+    dmg: int
     dmg_fire: int
     dmg_earth: int
     dmg_water: int
@@ -90,11 +117,15 @@ class CharacterSchema(BaseModel):
     res_earth: int
     res_water: int
     res_air: int
+    effects: List[StorageEffectSchema]
     x: int
     y: int
+    layer: LayerEnum
+    map_id: int
     cooldown: int
     cooldown_expiration: str
     weapon_slot: str
+    rune_slot: str
     shield_slot: str
     helmet_slot: str
     body_armor_slot: str
@@ -106,10 +137,11 @@ class CharacterSchema(BaseModel):
     artifact1_slot: str
     artifact2_slot: str
     artifact3_slot: str
-    consumable1_slot: str
-    consumable1_slot_quantity: int
-    consumable2_slot: str
-    consumable2_slot_quantity: int
+    utility1_slot: str
+    utility1_slot_quantity: int
+    utility2_slot: str
+    utility2_slot_quantity: int
+    bag_slot: str
     task: str
     task_type: str
     task_progress: int

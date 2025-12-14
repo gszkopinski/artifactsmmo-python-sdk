@@ -36,7 +36,7 @@ class Maps:
 
             return (
                 "Successfully fetched map.",
-                MapResponseSchema.model_validate(response.json())
+                MapResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:
@@ -48,13 +48,21 @@ class Maps:
 
     def get_all_maps(
         self,
-        content_code: Annotated[str, Field(description="Content code on the map.", pattern="^[a-zA-Z0-9_-]+$")],
-        content_type: Annotated[MapContentTypeSchema, Field(
-            description="Type of content on the map.",
-            pattern="^[a-zA-Z0-9_-]+$",
-        )],
+        content_code: Annotated[
+            str,
+            Field(description="Content code on the map.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        content_type: Annotated[
+            MapContentTypeSchema,
+            Field(
+                description="Type of content on the map.",
+                pattern="^[a-zA-Z0-9_-]+$",
+            ),
+        ],
         page: Annotated[int, Field(description="Page number.", ge=1, default=1)] = 1,
-        size: Annotated[int, Field(description="Page size.", ge=1, le=100, default=50)] = 50,
+        size: Annotated[
+            int, Field(description="Page size.", ge=1, le=100, default=50)
+        ] = 50,
     ) -> Tuple[str, ListMapResponseSchema | None]:
         """Fetch maps details."""
         try:
@@ -71,7 +79,7 @@ class Maps:
 
             return (
                 "Successfully fetched maps details.",
-                ListMapResponseSchema.model_validate(response.json())
+                ListMapResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:

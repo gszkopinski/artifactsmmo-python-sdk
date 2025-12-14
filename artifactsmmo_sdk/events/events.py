@@ -6,9 +6,7 @@ import requests
 
 from pydantic import Field
 
-from ..models.events import (
-    ListActiveEventResponseSchema
-)
+from ..models.events import ListActiveEventResponseSchema
 
 
 class Events:
@@ -23,10 +21,12 @@ class Events:
         self.api_url = api_url
         self.session = session
 
-    def get_all_events(
+    def get_all_active_events(
         self,
         page: Annotated[int, Field(description="Page number.", ge=1, default=1)] = 1,
-        size: Annotated[int, Field(description="Page size.", ge=1, le=100, default=50)] = 50,
+        size: Annotated[
+            int, Field(description="Page size.", ge=1, le=100, default=50)
+        ] = 50,
     ) -> Tuple[str, ListActiveEventResponseSchema | None]:
         """Fetch events details."""
         try:
@@ -34,14 +34,14 @@ class Events:
             parameters += f"&size={size}"
 
             response = self.session.get(
-                url=f"{self.api_url}/events?{parameters}",
+                url=f"{self.api_url}/events/active?{parameters}",
             )
 
             response.raise_for_status()
 
             return (
                 "Successfully fetched events details.",
-                ListActiveEventResponseSchema.model_validate(response.json())
+                ListActiveEventResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:

@@ -3,6 +3,7 @@
 from icecream import ic
 
 from artifactsmmo_sdk import ArtifactsClient
+from artifactsmmo_sdk.models.maps import MapContentTypeSchema
 
 
 artifacts_client = ArtifactsClient()
@@ -10,21 +11,29 @@ artifacts_client = ArtifactsClient()
 
 def test_get_map():
     """Tests."""
-    result = artifacts_client.maps.get_map(
+    error, result = artifacts_client.maps.get_map(
         x=-1,
         y=0,
     )
 
-    assert result
-    ic(result)
+    if not result:
+        print(error)
+
+    else:
+        assert result
+        ic(result)
 
 
 def test_get_all_maps():
     """Tests."""
-    result = artifacts_client.maps.get_all_maps(
+    error, result = artifacts_client.maps.get_all_maps(
         content_code="ogre",
-        content_type="monster",
+        content_type=MapContentTypeSchema.MONSTER,
     )
 
-    assert result
-    ic(result)
+    if not result:
+        print(error)
+
+    else:
+        assert result
+        ic(result)

@@ -27,7 +27,10 @@ class Resources:
 
     def get_resource(
         self,
-        code: Annotated[str, Field(description="The code of the monster.", pattern="^[a-zA-Z0-9_-]+$")],
+        code: Annotated[
+            str,
+            Field(description="The code of the monster.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
     ) -> Tuple[str, ResourceResponseSchema | None]:
         """Retrieve the details of a resource."""
         try:
@@ -39,7 +42,7 @@ class Resources:
 
             return (
                 "Successfully fetched resource.",
-                ResourceResponseSchema.model_validate(response.json())
+                ResourceResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:
@@ -51,12 +54,16 @@ class Resources:
 
     def get_all_resources(
         self,
-        drop: Annotated[str, Field(description="Item code of the drop.", pattern="^[a-zA-Z0-9_-]+$")],
+        drop: Annotated[
+            str, Field(description="Item code of the drop.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
         max_level: Annotated[int, Field(description="Monster maximum level.", ge=0)],
         min_level: Annotated[int, Field(description="Monster minimum level.", ge=0)],
         skill: Annotated[SkillEnum, Field(description="The code of the skill.")],
         page: Annotated[int, Field(description="Page number.", ge=1, default=1)] = 1,
-        size: Annotated[int, Field(description="Page size.", ge=1, le=100, default=50)] = 50,
+        size: Annotated[
+            int, Field(description="Page size.", ge=1, le=100, default=50)
+        ] = 50,
     ) -> Tuple[str, ListResourceResponseSchema | None]:
         """Return resources."""
         try:
@@ -73,10 +80,7 @@ class Resources:
 
             response.raise_for_status()
 
-            return (
-                "",
-                ListResourceResponseSchema.model_validate(response.json())
-            )
+            return ("", ListResourceResponseSchema.model_validate(response.json()))
 
         except requests.exceptions.HTTPError as error:
             match error.response.status_code:

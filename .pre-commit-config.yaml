@@ -9,38 +9,16 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
 
-  # python code formatting - will amend files
-  - repo: https://github.com/psf/black
-    rev: 24.8.0 # https://github.com/psf/black/tags
+  # Ruff
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.14.9
     hooks:
-      - id: black
-        additional_dependencies: [toml]
-
-  # python import sorting - will amend files
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        additional_dependencies: [toml]
-
-  # Flake8 includes pyflakes, pycodestyle, mccabe, pydocstyle, bandit
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.1
-    hooks:
-      - id: flake8
-        additional_dependencies: ["flake8-docstrings"]
-        exclude: ^tests|migrations
-        args: ["--max-line-length", "120"]
-
-  # python static type checking
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.1
-    hooks:
-      - id: mypy
-        args:
-          - --install-types
-          - --non-interactive
-        exclude: ^tests
+      # Run the linter.
+      - id: ruff-check
+        args: [ --fix ]
+      # Run the formatter.
+      - id: ruff-format
 
   # Poetry
   - repo: https://github.com/python-poetry/poetry
@@ -68,19 +46,6 @@ repos:
             "requirements-dev.txt",
           ]
 
-  # Pylint
-  - repo: local
-    hooks:
-      - id: pylint
-        name: pylint
-        entry: pylint
-        language: system
-        types: [python]
-        args:
-          [
-            "-rn", # Only display messages
-            "-sn", # Don't display the score
-          ]
 
 default_language_version:
   python: python3.12

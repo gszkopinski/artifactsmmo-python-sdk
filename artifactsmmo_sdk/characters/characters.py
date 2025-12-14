@@ -28,12 +28,15 @@ class Characters:
 
     def create_character(
         self,
-        name: Annotated[str, Field(
-            description="Your desired character name. It's unique and all players can see it.",
-            pattern="^[a-zA-Z0-9_-]+$",
-            min_length=3,
-            max_length=12,
-        )],
+        name: Annotated[
+            str,
+            Field(
+                description="Your desired character name. It's unique and all players can see it.",
+                pattern="^[a-zA-Z0-9_-]+$",
+                min_length=3,
+                max_length=12,
+            ),
+        ],
         skin: Annotated[CharacterSkinEnum, Field(description="Your desired skin.")],
     ) -> Tuple[str, CharacterResponseSchema | None]:
         """Create new character on your account. You can create up to 5 characters."""
@@ -47,7 +50,7 @@ class Characters:
 
             return (
                 "Successfully created character.",
-                CharacterResponseSchema.model_validate(response.json())
+                CharacterResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:
@@ -61,12 +64,15 @@ class Characters:
 
     def delete_character(
         self,
-        name: Annotated[str, Field(
-            description="Character name.",
-            pattern="^[a-zA-Z0-9_-]+$",
-            min_length=3,
-            max_length=12,
-        )],
+        name: Annotated[
+            str,
+            Field(
+                description="Character name.",
+                pattern="^[a-zA-Z0-9_-]+$",
+                min_length=3,
+                max_length=12,
+            ),
+        ],
     ) -> Tuple[str, CharacterResponseSchema | None]:
         """Delete character on your account."""
         try:
@@ -79,7 +85,7 @@ class Characters:
 
             return (
                 "Successfully deleted character.",
-                CharacterResponseSchema.model_validate(response.json())
+                CharacterResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:
@@ -91,12 +97,17 @@ class Characters:
 
     def get_all_characters(
         self,
-        sort: Annotated[str, Field(
-            description="Default sort by combat total XP.",
-            default="xp",
-        )] = CharacterSortEnum.GOLD.value,
+        sort: Annotated[
+            str,
+            Field(
+                description="Default sort by combat total XP.",
+                default="xp",
+            ),
+        ] = CharacterSortEnum.GOLD.value,
         page: Annotated[int, Field(description="Page number.", ge=1, default=1)] = 1,
-        size: Annotated[int, Field(description="Page size.", ge=1, le=100, default=50)] = 50,
+        size: Annotated[
+            int, Field(description="Page size.", ge=1, le=100, default=50)
+        ] = 50,
     ) -> Tuple[str, ListCharacterResponseSchema | None]:
         """Fetch characters details."""
         try:
@@ -112,7 +123,7 @@ class Characters:
 
             return (
                 "Successfully fetched characters details.",
-                ListCharacterResponseSchema.model_validate(response.json())
+                ListCharacterResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:
@@ -136,7 +147,7 @@ class Characters:
 
             return (
                 "Successfully fetched character.",
-                CharacterResponseSchema.model_validate(response.json())
+                CharacterResponseSchema.model_validate(response.json()),
             )
 
         except requests.exceptions.HTTPError as error:
