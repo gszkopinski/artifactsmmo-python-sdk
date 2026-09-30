@@ -7,7 +7,6 @@ from icecream import ic
 
 from artifactsmmo_sdk import ArtifactsClient
 
-
 load_dotenv()
 artifacts_client = ArtifactsClient()
 

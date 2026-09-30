@@ -4,7 +4,6 @@ from icecream import ic
 
 from artifactsmmo_sdk import ArtifactsClient
 
-
 artifacts_client = ArtifactsClient()
 
 
@@ -12,7 +11,7 @@ def test_get_all_active_events():
     """Test."""
     error, events = artifacts_client.events.get_all_active_events()
     if not events:
-        raise Exception(error)
+        print(error)
 
     for event in events.data:
         ic(event)

@@ -5,7 +5,6 @@ from icecream import ic
 from artifactsmmo_sdk import ArtifactsClient
 from artifactsmmo_sdk.models.maps import MapContentTypeSchema
 
-
 artifacts_client = ArtifactsClient()
 
 

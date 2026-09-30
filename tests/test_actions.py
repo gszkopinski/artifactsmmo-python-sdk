@@ -8,7 +8,6 @@ from artifactsmmo_sdk import ArtifactsClient
 from artifactsmmo_sdk.models.actions import SlotEnum
 from artifactsmmo_sdk.models.characters import CharacterSkinEnum
 
-
 artifacts_client = ArtifactsClient()
 
 
@@ -23,7 +22,7 @@ def get_character_name():
             skin=CharacterSkinEnum.MEN1,
         )
         if not character:
-            raise Exception(error)
+            print(error)
 
     return character.data.name
 

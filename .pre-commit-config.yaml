@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -12,7 +12,7 @@ repos:
   # Ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.14.9
+    rev: v0.16.9
     hooks:
       # Run the linter.
       - id: ruff-check
@@ -20,31 +20,14 @@ repos:
       # Run the formatter.
       - id: ruff-format
 
-  # Poetry
-  - repo: https://github.com/python-poetry/poetry
-    rev: 1.8.0
+  # UV
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.12.21
     hooks:
-      - id: poetry-check
-      - id: poetry-export
-        args:
-          [
-            "-f",
-            "requirements.txt",
-            "--without-hashes",
-            "-o",
-            "requirements.txt",
-          ]
-      - id: poetry-export
-        args:
-          [
-            "-f",
-            "requirements.txt",
-            "--without-hashes",
-            "--with",
-            "dev",
-            "-o",
-            "requirements-dev.txt",
-          ]
+      - id: uv-export
+        args: ["--format=requirements.txt", "--no-hashes", "--output-file", "requirements.txt"]
+      - id: uv-export
+        args: ["--format=requirements.txt", "--no-hashes", "--group", "dev", "--output-file", "requirements-dev.txt"]
 
 
 default_language_version:

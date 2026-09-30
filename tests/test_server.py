@@ -4,7 +4,6 @@ from icecream import ic
 
 from artifactsmmo_sdk import ArtifactsClient
 
-
 artifacts_client = ArtifactsClient()
 
 
