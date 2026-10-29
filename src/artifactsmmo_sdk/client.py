@@ -20,6 +20,7 @@ from .monsters import Monsters
 from .npcs import Npcs
 from .resources import Resources
 from .server import Server
+from .skins import Skins
 from .tasks import Tasks
 from .token import Token
 
@@ -62,5 +63,6 @@ class ArtifactsClient:
         self.npcs = Npcs(api_url=self.api_url, session=self.session)
         self.resources = Resources(api_url=self.api_url, session=self.session)
         self.server = Server(api_url=self.api_url, session=self.session)
+        self.skins = Skins(api_url=self.api_url, session=self.session)
         self.tasks = Tasks(api_url=self.api_url, session=self.session)
         self.token = Token(api_url=self.api_url, session=self.session)
