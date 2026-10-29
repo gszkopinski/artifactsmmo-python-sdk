@@ -29,6 +29,19 @@ class BankResponseSchema(BaseModel):
     data: BankSchema
 
 
+class CheckoutResponseSchema(BaseModel):
+    """Checkout session response."""
+
+    checkout_url: str
+    session_id: str
+
+
+class CheckoutResponseWrapperSchema(BaseModel):
+    """CheckoutResponseWrapperSchema"""
+
+    data: CheckoutResponseSchema
+
+
 class PendingItemSchemaPage(BaseModel):
     """DataPage[PendingItemSchema]"""
 
@@ -86,6 +99,13 @@ class RateLimitsSchema(BaseModel):
     """RateLimitsSchema"""
 
     data: RateLimitsDataSchema
+
+
+class StripeSubscriptionPlan(str, Enum):
+    """StripeSubscriptionPlan."""
+
+    MONTHLY = "monthly"
+    ANNUAL = "annual"
 
 
 class SubscriptionPlan(str, Enum):

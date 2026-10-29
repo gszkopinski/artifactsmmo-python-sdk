@@ -348,3 +348,22 @@ def test_get_my_subscription(client, respond):
 def test_get_my_subscription_error(client, respond):
     respond(404)
     assert client.account.get_my_subscription() == ("Subscription not found.", None)
+
+
+def test_subscribe_with_stripe(client, respond):
+    respond(200, {"data": {"checkout_url": "x", "session_id": "x"}})
+    message, data = client.account.subscribe_with_stripe(plan="monthly")
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/subscribe/stripe",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"plan": "monthly"}
+
+
+def test_subscribe_with_stripe_error(client, respond):
+    respond(565)
+    assert client.account.subscribe_with_stripe(plan="monthly") == (
+        "You already have an active subscription.",
+        None,
+    )

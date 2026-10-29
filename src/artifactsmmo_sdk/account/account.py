@@ -7,10 +7,12 @@ from pydantic import Field
 from ..base import BaseModule
 from ..models.account import (
     BankResponseSchema,
+    CheckoutResponseWrapperSchema,
     MyAccountDetailsSchema,
     PendingItemSchemaPage,
     RateLimitsSchema,
     SimpleItemSchemaPage,
+    StripeSubscriptionPlan,
     SubscriptionResponseSchema,
 )
 from ..models.common import (
@@ -217,5 +219,35 @@ class Account(BaseModule):
             "Successfully fetched data.",
             {
                 404: "Subscription not found.",
+            },
+        )
+
+    def subscribe_with_stripe(
+        self,
+        plan: Annotated[
+            StripeSubscriptionPlan,
+            Field(description="Stripe membership plan to purchase."),
+        ],
+        recurring: Annotated[
+            bool | None,
+            Field(
+                description="Whether to create a recurring Stripe subscription. Set to false to buy membership time once."
+            ),
+        ] = None,
+    ) -> tuple[str, CheckoutResponseWrapperSchema | None]:
+        """Subscribe to become a member and unlock the benefits tied to your selected plan.
+        You will receive a secure Stripe checkout URL to complete the payment."""
+        return self._request(
+            "POST",
+            "/my/subscribe/stripe",
+            CheckoutResponseWrapperSchema,
+            "Successfully fetched data.",
+            {
+                565: "You already have an active subscription.",
+                573: "An active Stripe subscription cannot be extended with gems or member tokens.",
+            },
+            json={
+                "plan": plan,
+                "recurring": recurring,
             },
         )
