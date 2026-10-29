@@ -7,6 +7,7 @@ from pydantic import Field
 from ..base import BaseModule
 from ..models.characters import (
     CharacterResponseSchema,
+    CharacterStatsResponseSchema,
 )
 
 
@@ -56,5 +57,26 @@ class Characters(BaseModule):
             "Successfully deleted character.",
             json={
                 "name": name,
+            },
+        )
+
+    def get_character_stats(
+        self,
+        name: Annotated[
+            str,
+            Field(description="The name of the character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, CharacterStatsResponseSchema | None]:
+        """Retrieve gameplay statistics for a character.
+
+        Stats are only visible if the character's account has an active subscription.
+        Statistics are still collected for all accounts regardless of subscription status."""
+        return self._request(
+            "GET",
+            f"/characters/{name}/stats",
+            CharacterStatsResponseSchema,
+            "Successfully fetched character stats.",
+            {
+                404: "character stats not found.",
             },
         )

@@ -217,3 +217,35 @@ def test_delete_character_error(client, respond):
         "Character not found.",
         None,
     )
+
+
+def test_get_character_stats(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "monsters_killed": {"k": 1},
+                "resources_gathered": {"k": 1},
+                "items_crafted": {"k": 1},
+                "action_counts": {"k": 1},
+                "deaths": 1,
+            }
+        },
+    )
+    message, data = client.characters.get_character_stats(name="bob")
+    assert (message, data is not None) == (
+        "Successfully fetched character stats.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/characters/bob/stats",
+    )
+
+
+def test_get_character_stats_error(client, respond):
+    respond(404)
+    assert client.characters.get_character_stats(name="bob") == (
+        "character stats not found.",
+        None,
+    )
