@@ -41,3 +41,20 @@ class Characters(BaseModule):
                 "skin": skin,
             },
         )
+
+    def delete_character(
+        self,
+        name: Annotated[
+            str, Field(description="Character name.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+    ) -> tuple[str, CharacterResponseSchema | None]:
+        """Delete character on your account."""
+        return self._request(
+            "POST",
+            "/characters/delete",
+            CharacterResponseSchema,
+            "Successfully deleted character.",
+            json={
+                "name": name,
+            },
+        )
