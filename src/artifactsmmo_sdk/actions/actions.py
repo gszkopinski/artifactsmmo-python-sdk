@@ -7,6 +7,7 @@ from pydantic import Field
 from ..base import BaseModule
 from ..models.actions import (
     BankGoldTransactionResponseSchema,
+    BankItemTransactionResponseSchema,
     CharacterFightResponseSchema,
     CharacterMovementResponseSchema,
     CharacterRestResponseSchema,
@@ -16,6 +17,9 @@ from ..models.actions import (
     SkillResponseSchema,
     UnequipSchema,
     UseItemResponseSchema,
+)
+from ..models.common import (
+    SimpleItemSchema,
 )
 
 
@@ -277,4 +281,31 @@ class Actions(BaseModule):
             json={
                 "quantity": quantity,
             },
+        )
+
+    def deposit_bank(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        items: Annotated[
+            list[SimpleItemSchema],
+            Field(description="List of items to deposit in the bank."),
+        ],
+    ) -> tuple[str, BankItemTransactionResponseSchema | None]:
+        """Deposit multiple items in a bank on the character's map.
+        The cooldown will be 3 seconds multiplied by the number of different items deposited."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/bank/deposit/item",
+            BankItemTransactionResponseSchema,
+            "Items successfully deposited in your bank.",
+            {
+                404: "Item not found.",
+                461: "Some of your items or your gold in the bank are already part of an ongoing transaction.",
+                462: "Your bank is full.",
+                598: "Bank not found on this map.",
+            },
+            json=[item.model_dump(mode="json", exclude_none=True) for item in items],
         )

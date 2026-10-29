@@ -5,7 +5,13 @@ from enum import Enum
 
 from pydantic import BaseModel
 
-from .common import CharacterSchema, ItemSchema, MapSchema, TransitionSchema
+from .common import (
+    CharacterSchema,
+    ItemSchema,
+    MapSchema,
+    SimpleItemSchema,
+    TransitionSchema,
+)
 
 
 class ActionType(str, Enum):
@@ -78,6 +84,21 @@ class BankGoldTransactionResponseSchema(BaseModel):
     """BankGoldTransactionResponseSchema"""
 
     data: BankGoldTransactionSchema
+
+
+class BankItemTransactionSchema(BaseModel):
+    """BankItemTransactionSchema"""
+
+    cooldown: CooldownSchema
+    items: list[SimpleItemSchema]
+    bank: list[SimpleItemSchema]
+    character: CharacterSchema
+
+
+class BankItemTransactionResponseSchema(BaseModel):
+    """BankItemTransactionResponseSchema"""
+
+    data: BankItemTransactionSchema
 
 
 class DropSchema(BaseModel):
