@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.badges import (
+    BadgeResponseSchema,
     StaticDataPage_BadgeSchema_,
 )
 
@@ -27,5 +28,22 @@ class Badges(BaseModule):
             params={
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_badge(
+        self,
+        code: Annotated[
+            str, Field(description="The code of the badge.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+    ) -> tuple[str, BadgeResponseSchema | None]:
+        """Retrieve the details of a badge."""
+        return self._request(
+            "GET",
+            f"/badges/{code}",
+            BadgeResponseSchema,
+            "Successfully fetched badge.",
+            {
+                404: "badge not found.",
             },
         )

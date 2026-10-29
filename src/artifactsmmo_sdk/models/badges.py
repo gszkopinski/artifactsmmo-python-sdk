@@ -11,6 +11,12 @@ class BadgeSchema(BaseModel):
     description: str
 
 
+class BadgeResponseSchema(BaseModel):
+    """BadgeResponseSchema"""
+
+    data: BadgeSchema
+
+
 class StaticDataPage_BadgeSchema_(BaseModel):
     """StaticDataPage[BadgeSchema]"""
 
