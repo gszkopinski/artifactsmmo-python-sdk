@@ -42,3 +42,9 @@ class AccountAchievementSchemaPage(BaseModel):
     page: int
     size: int
     pages: int
+
+
+class PasswordResetResponseSchema(BaseModel):
+    """PasswordResetResponseSchema"""
+
+    message: str

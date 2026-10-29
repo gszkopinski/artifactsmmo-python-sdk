@@ -173,3 +173,25 @@ def test_create_account_error(client, respond):
     assert client.accounts.create_account(
         username="x", password="x", email="a@b.co"
     ) == ("This username is already taken.", None)
+
+
+def test_forgot_password(client, respond):
+    respond(200, {"message": "x"})
+    message, data = client.accounts.forgot_password(email="a@b.co")
+    assert (message, data is not None) == (
+        "If this email address is associated with an account, a reset link has been sent.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/accounts/forgot_password",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"email": "a@b.co"}
+
+
+def test_forgot_password_error(client, respond):
+    respond(422)
+    assert client.accounts.forgot_password(email="a@b.co") == (
+        "Request could not be processed due to an invalid payload.",
+        None,
+    )

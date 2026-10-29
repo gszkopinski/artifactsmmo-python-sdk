@@ -8,6 +8,7 @@ from ..base import BaseModule
 from ..models.accounts import (
     AccountAchievementSchemaPage,
     CharactersListSchema,
+    PasswordResetResponseSchema,
 )
 from ..models.common import (
     AchievementType,
@@ -88,6 +89,21 @@ class Accounts(BaseModule):
             json={
                 "username": username,
                 "password": password,
+                "email": email,
+            },
+        )
+
+    def forgot_password(
+        self,
+        email: Annotated[str, Field(description="Your email address.")],
+    ) -> tuple[str, PasswordResetResponseSchema | None]:
+        """Request a password reset."""
+        return self._request(
+            "POST",
+            "/accounts/forgot_password",
+            PasswordResetResponseSchema,
+            "If this email address is associated with an account, a reset link has been sent.",
+            json={
                 "email": email,
             },
         )
