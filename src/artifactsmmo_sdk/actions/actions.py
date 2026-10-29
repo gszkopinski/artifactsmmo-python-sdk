@@ -7,6 +7,7 @@ from pydantic import Field
 from ..base import BaseModule
 from ..models.actions import (
     CharacterMovementResponseSchema,
+    CharacterTransitionResponseSchema,
 )
 
 
@@ -47,5 +48,26 @@ class Actions(BaseModule):
                 "x": x,
                 "y": y,
                 "map_id": map_id,
+            },
+        )
+
+    def transition(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, CharacterTransitionResponseSchema | None]:
+        """Execute a transition from the current map to another layer.
+        The character must be on a map that has a transition available."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/transition",
+            CharacterTransitionResponseSchema,
+            "The character has transitioned successfully.",
+            {
+                404: "Transition not found.",
+                492: "Insufficient gold for this transition.",
+                496: "Conditions not met.",
             },
         )

@@ -5,7 +5,7 @@ from enum import Enum
 
 from pydantic import BaseModel
 
-from .common import CharacterSchema, MapSchema
+from .common import CharacterSchema, MapSchema, TransitionSchema
 
 
 class ActionType(str, Enum):
@@ -73,3 +73,18 @@ class CharacterMovementResponseSchema(BaseModel):
     """CharacterMovementResponseSchema"""
 
     data: CharacterMovementDataSchema
+
+
+class CharacterTransitionDataSchema(BaseModel):
+    """CharacterTransitionDataSchema"""
+
+    cooldown: CooldownSchema
+    destination: MapSchema
+    transition: TransitionSchema
+    character: CharacterSchema
+
+
+class CharacterTransitionResponseSchema(BaseModel):
+    """CharacterTransitionResponseSchema"""
+
+    data: CharacterTransitionDataSchema
