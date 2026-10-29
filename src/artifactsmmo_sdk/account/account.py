@@ -8,6 +8,7 @@ from ..base import BaseModule
 from ..models.account import (
     BankResponseSchema,
     MyAccountDetailsSchema,
+    PendingItemSchemaPage,
     SimpleItemSchemaPage,
 )
 from ..models.common import (
@@ -123,4 +124,24 @@ class Account(BaseModule):
             "/my/details",
             MyAccountDetailsSchema,
             "Successfully fetched data.",
+        )
+
+    def get_pending_items(
+        self,
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=100)] = 50,
+    ) -> tuple[str, PendingItemSchemaPage | None]:
+        """Retrieve all unclaimed pending items for your account.
+
+        These are items from various sources (achievements, grand exchange, events, etc.)
+        that can be claimed by any character on your account using /my/{name}/action/claim/{id}."""
+        return self._request(
+            "GET",
+            "/my/pending_items",
+            PendingItemSchemaPage,
+            "Successfully fetched pending items.",
+            params={
+                "page": page,
+                "size": size,
+            },
         )

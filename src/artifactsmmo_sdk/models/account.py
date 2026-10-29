@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from .common import AccountStatus, SimpleItemSchema
+from .common import AccountStatus, PendingItemSchema, SimpleItemSchema
 
 
 class BankSchema(BaseModel):
@@ -20,6 +20,16 @@ class BankResponseSchema(BaseModel):
     """BankResponseSchema"""
 
     data: BankSchema
+
+
+class PendingItemSchemaPage(BaseModel):
+    """DataPage[PendingItemSchema]"""
+
+    data: list[PendingItemSchema]
+    total: int
+    page: int
+    size: int
+    pages: int
 
 
 class SimpleItemSchemaPage(BaseModel):

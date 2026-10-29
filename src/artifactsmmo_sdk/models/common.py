@@ -67,13 +67,15 @@ class GEOrderSchemaPage(BaseModel):
     pages: int
 
 
-class RewardType(str, Enum):
-    """RewardType."""
+class PendingItemSource(str, Enum):
+    """PendingItemSource."""
 
-    BADGE = "badge"
-    SKIN = "skin"
-    GOLD = "gold"
-    ITEM = "item"
+    ACHIEVEMENT = "achievement"
+    GRAND_EXCHANGE = "grand_exchange"
+    ADMIN = "admin"
+    EVENT = "event"
+    RAID = "raid"
+    OTHER = "other"
 
 
 class SimpleItemSchema(BaseModel):
@@ -81,3 +83,26 @@ class SimpleItemSchema(BaseModel):
 
     code: str
     quantity: int
+
+
+class PendingItemSchema(BaseModel):
+    """Schema for pending items that can be claimed by any character."""
+
+    id: str
+    account: str
+    source: PendingItemSource
+    source_id: str | None = None
+    description: str
+    gold: int | None = None
+    items: list[SimpleItemSchema] | None = None
+    created_at: datetime
+    claimed_at: datetime | None = None
+
+
+class RewardType(str, Enum):
+    """RewardType."""
+
+    BADGE = "badge"
+    SKIN = "skin"
+    GOLD = "gold"
+    ITEM = "item"

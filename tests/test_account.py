@@ -117,3 +117,35 @@ def test_get_account_details(client, respond):
         "GET",
         "http://api.test/my/details",
     )
+
+
+def test_get_pending_items(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "id": "x",
+                    "account": "x",
+                    "source": "achievement",
+                    "source_id": "x",
+                    "description": "x",
+                    "gold": 1,
+                    "items": [{"code": "x", "quantity": 1}],
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "claimed_at": "2024-01-01T00:00:00Z",
+                }
+            ],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.account.get_pending_items()
+    assert (message, data is not None) == ("Successfully fetched pending items.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/pending_items",
+    )
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
