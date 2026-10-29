@@ -269,3 +269,17 @@ class Account(BaseModule):
                 573: "An active Stripe subscription cannot be extended with gems or member tokens.",
             },
         )
+
+    def cancel_subscription(
+        self,
+    ) -> tuple[str, ResponseSchema | None]:
+        """Cancel subscription at the end of the current billing period."""
+        return self._request(
+            "POST",
+            "/my/subscribe/cancel",
+            ResponseSchema,
+            "Successfully fetched data.",
+            {
+                404: "Subscription not found.",
+            },
+        )

@@ -394,3 +394,18 @@ def test_subscribe_with_member_token_error(client, respond):
         "Insufficient member tokens.",
         None,
     )
+
+
+def test_cancel_subscription(client, respond):
+    respond(200, {"message": "x"})
+    message, data = client.account.cancel_subscription()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/subscribe/cancel",
+    )
+
+
+def test_cancel_subscription_error(client, respond):
+    respond(404)
+    assert client.account.cancel_subscription() == ("Subscription not found.", None)
