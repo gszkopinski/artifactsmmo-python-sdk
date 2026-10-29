@@ -21,6 +21,7 @@ from ..models.actions import (
     RecyclingResponseSchema,
     RewardDataResponseSchema,
     SkillResponseSchema,
+    TaskCancelledResponseSchema,
     TaskResponseSchema,
     TaskTradeResponseSchema,
     UnequipSchema,
@@ -716,5 +717,24 @@ class Actions(BaseModule):
             json={
                 "code": code,
                 "quantity": quantity,
+            },
+        )
+
+    def task_cancel(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, TaskCancelledResponseSchema | None]:
+        """Cancel a task for 1 tasks coin."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/task/cancel",
+            TaskCancelledResponseSchema,
+            "The task has been successfully cancelled.",
+            {
+                487: "The character has no task assigned.",
+                598: "Tasks Master not found on this map.",
             },
         )

@@ -395,6 +395,19 @@ class SkillResponseSchema(BaseModel):
     data: SkillDataSchema
 
 
+class TaskCancelledSchema(BaseModel):
+    """TaskCancelledSchema"""
+
+    cooldown: CooldownSchema
+    character: CharacterSchema
+
+
+class TaskCancelledResponseSchema(BaseModel):
+    """TaskCancelledResponseSchema"""
+
+    data: TaskCancelledSchema
+
+
 class TaskSchema(BaseModel):
     """TaskSchema"""
 
