@@ -22,6 +22,7 @@ from ..models.actions import (
     RewardDataResponseSchema,
     SkillResponseSchema,
     TaskResponseSchema,
+    TaskTradeResponseSchema,
     UnequipSchema,
     UseItemResponseSchema,
 )
@@ -687,5 +688,33 @@ class Actions(BaseModule):
             {
                 489: "The character already has an assigned task.",
                 598: "Tasks Master not found on this map.",
+            },
+        )
+
+    def task_trade(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        code: Annotated[
+            str, Field(description="Item code.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+        quantity: Annotated[int, Field(description="Item quantity.", ge=1)],
+    ) -> tuple[str, TaskTradeResponseSchema | None]:
+        """Trading items with a Tasks Master."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/task/trade",
+            TaskTradeResponseSchema,
+            "You have successfully trade items to a Tasks Master.",
+            {
+                474: "The character does not have this task.",
+                475: "Task already completed or too many items submitted.",
+                598: "Tasks Master not found on this map.",
+            },
+            json={
+                "code": code,
+                "quantity": quantity,
             },
         )

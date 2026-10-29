@@ -418,6 +418,27 @@ class TaskResponseSchema(BaseModel):
     data: TaskDataSchema
 
 
+class TaskTradeSchema(BaseModel):
+    """TaskTradeSchema"""
+
+    code: str
+    quantity: int
+
+
+class TaskTradeDataSchema(BaseModel):
+    """TaskTradeDataSchema"""
+
+    cooldown: CooldownSchema
+    trade: TaskTradeSchema
+    character: CharacterSchema
+
+
+class TaskTradeResponseSchema(BaseModel):
+    """TaskTradeResponseSchema"""
+
+    data: TaskTradeDataSchema
+
+
 class UnequipSchema(BaseModel):
     """UnequipSchema"""
 
