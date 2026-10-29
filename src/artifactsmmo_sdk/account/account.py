@@ -9,6 +9,7 @@ from ..models.account import (
     BankResponseSchema,
     MyAccountDetailsSchema,
     PendingItemSchemaPage,
+    RateLimitsSchema,
     SimpleItemSchemaPage,
 )
 from ..models.common import (
@@ -144,4 +145,15 @@ class Account(BaseModule):
                 "page": page,
                 "size": size,
             },
+        )
+
+    def get_rate_limits(
+        self,
+    ) -> tuple[str, RateLimitsSchema | None]:
+        """Get all rate limits."""
+        return self._request(
+            "GET",
+            "/my/rates",
+            RateLimitsSchema,
+            "Successfully fetched rate limits.",
         )

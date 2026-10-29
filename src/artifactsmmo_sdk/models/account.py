@@ -4,7 +4,12 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from .common import AccountStatus, PendingItemSchema, SimpleItemSchema
+from .common import (
+    AccountStatus,
+    PendingItemSchema,
+    RateLimitScopeSchema,
+    SimpleItemSchema,
+)
 
 
 class BankSchema(BaseModel):
@@ -63,3 +68,19 @@ class MyAccountDetailsSchema(BaseModel):
     """MyAccountDetailsSchema"""
 
     data: MyAccountDetails
+
+
+class RateLimitsDataSchema(BaseModel):
+    """RateLimitsDataSchema"""
+
+    account: RateLimitScopeSchema
+    data: RateLimitScopeSchema
+    action: RateLimitScopeSchema
+    simulation: RateLimitScopeSchema
+    assistant: RateLimitScopeSchema | None = None
+
+
+class RateLimitsSchema(BaseModel):
+    """RateLimitsSchema"""
+
+    data: RateLimitsDataSchema

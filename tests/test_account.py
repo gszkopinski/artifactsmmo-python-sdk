@@ -149,3 +149,126 @@ def test_get_pending_items(client, respond):
         "http://api.test/my/pending_items",
     )
     assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
+
+
+def test_get_rate_limits(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "account": {
+                    "second": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "minute": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "hour": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "day": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                },
+                "data": {
+                    "second": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "minute": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "hour": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "day": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                },
+                "action": {
+                    "second": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "minute": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "hour": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "day": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                },
+                "simulation": {
+                    "second": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "minute": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "hour": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "day": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                },
+                "assistant": {
+                    "second": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "minute": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "hour": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "day": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                },
+            }
+        },
+    )
+    message, data = client.account.get_rate_limits()
+    assert (message, data is not None) == ("Successfully fetched rate limits.", True)
+    assert client.session.request.call_args.args == ("GET", "http://api.test/my/rates")

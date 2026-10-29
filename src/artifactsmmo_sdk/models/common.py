@@ -99,6 +99,23 @@ class PendingItemSchema(BaseModel):
     claimed_at: datetime | None = None
 
 
+class RateLimitWindowSchema(BaseModel):
+    """RateLimitWindowSchema"""
+
+    limit: int
+    remaining: int
+    reset: datetime
+
+
+class RateLimitScopeSchema(BaseModel):
+    """RateLimitScopeSchema"""
+
+    second: RateLimitWindowSchema | None = None
+    minute: RateLimitWindowSchema | None = None
+    hour: RateLimitWindowSchema | None = None
+    day: RateLimitWindowSchema | None = None
+
+
 class RewardType(str, Enum):
     """RewardType."""
 
