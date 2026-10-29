@@ -432,3 +432,26 @@ def test_get_my_purchase_history(client, respond):
         "GET",
         "http://api.test/my/purchase_history",
     )
+
+
+def test_get_my_gems_history(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "type": "x",
+                    "gems": 1,
+                    "description": "x",
+                    "metadata": {},
+                    "created_at": "2024-01-01T00:00:00Z",
+                }
+            ]
+        },
+    )
+    message, data = client.account.get_my_gems_history()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/gems_history",
+    )

@@ -8,6 +8,7 @@ from ..base import BaseModule
 from ..models.account import (
     BankResponseSchema,
     CheckoutResponseWrapperSchema,
+    GemTransactionListResponseSchema,
     MemberTokenSubscriptionResponseSchema,
     MyAccountDetailsSchema,
     PendingItemSchemaPage,
@@ -293,5 +294,16 @@ class Account(BaseModule):
             "GET",
             "/my/purchase_history",
             PurchaseHistoryListResponseSchema,
+            "Successfully fetched data.",
+        )
+
+    def get_my_gems_history(
+        self,
+    ) -> tuple[str, GemTransactionListResponseSchema | None]:
+        """List all gem credits and debits."""
+        return self._request(
+            "GET",
+            "/my/gems_history",
+            GemTransactionListResponseSchema,
             "Successfully fetched data.",
         )

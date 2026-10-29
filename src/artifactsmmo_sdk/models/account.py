@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
@@ -60,6 +60,22 @@ class SimpleItemSchemaPage(BaseModel):
     page: int
     size: int
     pages: int
+
+
+class GemTransactionSchema(BaseModel):
+    """GemTransactionSchema"""
+
+    type: str
+    gems: int
+    description: str
+    metadata: dict[str, Any]
+    created_at: datetime
+
+
+class GemTransactionListResponseSchema(BaseModel):
+    """GemTransactionListResponseSchema"""
+
+    data: list[GemTransactionSchema]
 
 
 class MemberTokenSubscriptionResponseDataSchema(BaseModel):
