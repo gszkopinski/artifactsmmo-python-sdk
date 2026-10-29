@@ -99,6 +99,29 @@ class MyAccountDetailsSchema(BaseModel):
     data: MyAccountDetails
 
 
+class PurchaseType(str, Enum):
+    """PurchaseType."""
+
+    SUBSCRIPTION = "subscription"
+    GEM_PACK = "gem_pack"
+
+
+class PurchaseHistorySchema(BaseModel):
+    """PurchaseHistorySchema"""
+
+    type: PurchaseType
+    description: str
+    amount: int
+    gems_credited: int | None = None
+    created_at: datetime
+
+
+class PurchaseHistoryListResponseSchema(BaseModel):
+    """PurchaseHistoryListResponseSchema"""
+
+    data: list[PurchaseHistorySchema]
+
+
 class RateLimitsDataSchema(BaseModel):
     """RateLimitsDataSchema"""
 

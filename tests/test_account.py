@@ -409,3 +409,26 @@ def test_cancel_subscription(client, respond):
 def test_cancel_subscription_error(client, respond):
     respond(404)
     assert client.account.cancel_subscription() == ("Subscription not found.", None)
+
+
+def test_get_my_purchase_history(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "type": "subscription",
+                    "description": "x",
+                    "amount": 1,
+                    "gems_credited": 1,
+                    "created_at": "2024-01-01T00:00:00Z",
+                }
+            ]
+        },
+    )
+    message, data = client.account.get_my_purchase_history()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/purchase_history",
+    )

@@ -11,6 +11,7 @@ from ..models.account import (
     MemberTokenSubscriptionResponseSchema,
     MyAccountDetailsSchema,
     PendingItemSchemaPage,
+    PurchaseHistoryListResponseSchema,
     RateLimitsSchema,
     SimpleItemSchemaPage,
     StripeSubscriptionPlan,
@@ -282,4 +283,15 @@ class Account(BaseModule):
             {
                 404: "Subscription not found.",
             },
+        )
+
+    def get_my_purchase_history(
+        self,
+    ) -> tuple[str, PurchaseHistoryListResponseSchema | None]:
+        """List all purchases (subscriptions and gem packs)."""
+        return self._request(
+            "GET",
+            "/my/purchase_history",
+            PurchaseHistoryListResponseSchema,
+            "Successfully fetched data.",
         )
