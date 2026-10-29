@@ -90,3 +90,31 @@ def test_get_npc_items(client, respond):
 def test_get_npc_items_error(client, respond):
     respond(404)
     assert client.npcs.get_npc_items(code="x") == ("NPC items not found.", None)
+
+
+def test_get_all_npcs_items(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "code": "x",
+                    "npc": "x",
+                    "currency": "x",
+                    "buy_price": 1,
+                    "sell_price": 1,
+                }
+            ],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.npcs.get_all_npcs_items()
+    assert (message, data is not None) == ("Successfully fetched NPC items.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/npcs/items",
+    )
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}

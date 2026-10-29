@@ -98,3 +98,32 @@ class Npcs(BaseModule):
                 "size": size,
             },
         )
+
+    def get_all_npcs_items(
+        self,
+        code: Annotated[
+            str | None, Field(description="Item code.", pattern="^[a-zA-Z0-9_-]+$")
+        ] = None,
+        npc: Annotated[
+            str | None, Field(description="NPC code.", pattern="^[a-zA-Z0-9_-]+$")
+        ] = None,
+        currency: Annotated[
+            str | None, Field(description="Currency code.", pattern="^[a-zA-Z0-9_-]+$")
+        ] = None,
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=10000)] = 50,
+    ) -> tuple[str, StaticDataPage_NPCItemSchema_ | None]:
+        """Retrieve the list of all NPC items."""
+        return self._request(
+            "GET",
+            "/npcs/items",
+            StaticDataPage_NPCItemSchema_,
+            "Successfully fetched NPC items.",
+            params={
+                "code": code,
+                "npc": npc,
+                "currency": currency,
+                "page": page,
+                "size": size,
+            },
+        )
