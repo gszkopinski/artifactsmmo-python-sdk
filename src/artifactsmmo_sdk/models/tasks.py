@@ -4,7 +4,7 @@ from enum import Enum
 
 from pydantic import BaseModel
 
-from .common import RewardsSchema, TaskType
+from .common import DropRateSchema, RewardsSchema, TaskType
 
 
 class Skill(str, Enum):
@@ -18,6 +18,16 @@ class Skill(str, Enum):
     MINING = "mining"
     ALCHEMY = "alchemy"
     FISHING = "fishing"
+
+
+class StaticDataPage_DropRateSchema_(BaseModel):
+    """StaticDataPage[DropRateSchema]"""
+
+    data: list[DropRateSchema]
+    total: int
+    page: int
+    size: int
+    pages: int
 
 
 class TaskFullSchema(BaseModel):

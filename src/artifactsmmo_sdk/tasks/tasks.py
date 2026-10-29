@@ -10,6 +10,7 @@ from ..models.common import (
 )
 from ..models.tasks import (
     Skill,
+    StaticDataPage_DropRateSchema_,
     StaticDataPage_TaskFullSchema_,
     TaskFullResponseSchema,
 )
@@ -61,5 +62,22 @@ class Tasks(BaseModule):
             "Successfully fetched task.",
             {
                 404: "task not found.",
+            },
+        )
+
+    def get_all_tasks_rewards(
+        self,
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=10000)] = 50,
+    ) -> tuple[str, StaticDataPage_DropRateSchema_ | None]:
+        """Fetch the list of all tasks rewards. To obtain these rewards, you must exchange 6 task coins with a tasks master."""
+        return self._request(
+            "GET",
+            "/tasks/rewards",
+            StaticDataPage_DropRateSchema_,
+            "Successfully fetched tasks rewards.",
+            params={
+                "page": page,
+                "size": size,
             },
         )
