@@ -12,6 +12,7 @@ from ..models.actions import (
     CharacterTransitionResponseSchema,
     EquipmentResponseSchema,
     EquipSchema,
+    SkillResponseSchema,
     UnequipSchema,
     UseItemResponseSchema,
 )
@@ -201,5 +202,24 @@ class Actions(BaseModule):
             },
             json={
                 "participants": participants,
+            },
+        )
+
+    def gathering(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, SkillResponseSchema | None]:
+        """Harvest a resource on the character's map."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/gathering",
+            SkillResponseSchema,
+            "The resource has been successfully gathered.",
+            {
+                493: "The character's skill level is too low.",
+                598: "Resource not found on this map.",
             },
         )

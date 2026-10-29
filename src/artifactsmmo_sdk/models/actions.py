@@ -202,6 +202,27 @@ class EquipmentResponseSchema(BaseModel):
     data: EquipmentTransactionSchema
 
 
+class SkillInfoSchema(BaseModel):
+    """SkillInfoSchema"""
+
+    xp: int
+    items: list[DropSchema]
+
+
+class SkillDataSchema(BaseModel):
+    """SkillDataSchema"""
+
+    cooldown: CooldownSchema
+    details: SkillInfoSchema
+    character: CharacterSchema
+
+
+class SkillResponseSchema(BaseModel):
+    """SkillResponseSchema"""
+
+    data: SkillDataSchema
+
+
 class UnequipSchema(BaseModel):
     """UnequipSchema"""
 
