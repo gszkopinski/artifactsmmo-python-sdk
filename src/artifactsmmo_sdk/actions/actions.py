@@ -332,3 +332,27 @@ class Actions(BaseModule):
             },
             json=[item.model_dump(mode="json", exclude_none=True) for item in items],
         )
+
+    def withdraw_bank_gold(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        quantity: Annotated[int, Field(description="Quantity of gold.", ge=1)],
+    ) -> tuple[str, BankGoldTransactionResponseSchema | None]:
+        """Withdraw gold from your bank."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/bank/withdraw/gold",
+            BankGoldTransactionResponseSchema,
+            "Golds successfully withdraw from your bank.",
+            {
+                460: "Insufficient gold in your bank.",
+                461: "Some of your items or your gold in the bank are already part of an ongoing transaction.",
+                598: "Bank not found on this map.",
+            },
+            json={
+                "quantity": quantity,
+            },
+        )
