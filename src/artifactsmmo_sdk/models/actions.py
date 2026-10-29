@@ -263,6 +263,31 @@ class EquipmentResponseSchema(BaseModel):
     data: EquipmentTransactionSchema
 
 
+class GEOrderCreatedSchema(BaseModel):
+    """GEOrderCreatedSchema"""
+
+    id: str
+    created_at: datetime
+    code: str
+    quantity: int
+    price: int
+    total_price: int
+
+
+class GEOrderTransactionSchema(BaseModel):
+    """GEOrderTransactionSchema"""
+
+    cooldown: CooldownSchema
+    order: GEOrderCreatedSchema
+    character: CharacterSchema
+
+
+class GECreateOrderTransactionResponseSchema(BaseModel):
+    """GECreateOrderTransactionResponseSchema"""
+
+    data: GEOrderTransactionSchema
+
+
 class GETransactionSchema(BaseModel):
     """GETransactionSchema"""
 

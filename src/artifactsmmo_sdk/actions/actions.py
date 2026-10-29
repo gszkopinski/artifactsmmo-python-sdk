@@ -15,6 +15,7 @@ from ..models.actions import (
     CharacterTransitionResponseSchema,
     EquipmentResponseSchema,
     EquipSchema,
+    GECreateOrderTransactionResponseSchema,
     GETransactionResponseSchema,
     NpcMerchantTransactionResponseSchema,
     RecyclingResponseSchema,
@@ -495,5 +496,38 @@ class Actions(BaseModule):
             json={
                 "id": id,
                 "quantity": quantity,
+            },
+        )
+
+    def ge_create_sell_order(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        code: Annotated[
+            str, Field(description="Item code.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+        quantity: Annotated[int, Field(description="Item quantity.", ge=1, le=100)],
+        price: Annotated[
+            int, Field(description="Item price per unit.", ge=1, le=1000000000)
+        ],
+    ) -> tuple[str, GECreateOrderTransactionResponseSchema | None]:
+        """Create a sell order at the Grand Exchange on the character's map."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/grandexchange/create_sell_order",
+            GECreateOrderTransactionResponseSchema,
+            "The sell order has been successfully created.",
+            {
+                404: "Item not found.",
+                433: "You cannot create more than 100 orders at the same time.",
+                437: "This item cannot be sold.",
+                598: "Grand Exchange not found on this map.",
+            },
+            json={
+                "code": code,
+                "quantity": quantity,
+                "price": price,
             },
         )
