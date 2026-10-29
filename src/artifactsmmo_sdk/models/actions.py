@@ -124,6 +124,20 @@ class BankItemTransactionResponseSchema(BaseModel):
     data: BankItemTransactionSchema
 
 
+class ChangeSkinCharacterDataSchema(BaseModel):
+    """ChangeSkinCharacterDataSchema"""
+
+    cooldown: CooldownSchema
+    skin: str
+    character: CharacterSchema
+
+
+class ChangeSkinResponseSchema(BaseModel):
+    """ChangeSkinResponseSchema"""
+
+    data: ChangeSkinCharacterDataSchema
+
+
 class DropSchema(BaseModel):
     """DropSchema"""
 

@@ -9,6 +9,7 @@ from ..models.actions import (
     BankExtensionTransactionResponseSchema,
     BankGoldTransactionResponseSchema,
     BankItemTransactionResponseSchema,
+    ChangeSkinResponseSchema,
     CharacterFightResponseSchema,
     CharacterMovementResponseSchema,
     CharacterRestResponseSchema,
@@ -851,5 +852,28 @@ class Actions(BaseModule):
             json={
                 "code": code,
                 "quantity": quantity,
+            },
+        )
+
+    def change_skin(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        skin: Annotated[str, Field(description="Your desired skin.")],
+    ) -> tuple[str, ChangeSkinResponseSchema | None]:
+        """Change the skin of your character."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/change_skin",
+            ChangeSkinResponseSchema,
+            "Skin successfully changed.",
+            {
+                404: "Skin not found.",
+                550: "You cannot choose this skin because you do not own it.",
+            },
+            json={
+                "skin": skin,
             },
         )
