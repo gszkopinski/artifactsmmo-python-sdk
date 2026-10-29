@@ -15,6 +15,7 @@ from .effects import Effects
 from .events import Events
 from .grand_exchange import GrandExchange
 from .items import Items
+from .leaderboard import Leaderboard
 from .maps import Maps
 from .monsters import Monsters
 from .npcs import Npcs
@@ -59,6 +60,7 @@ class ArtifactsClient:
         self.events = Events(api_url=self.api_url, session=self.session)
         self.grand_exchange = GrandExchange(api_url=self.api_url, session=self.session)
         self.items = Items(api_url=self.api_url, session=self.session)
+        self.leaderboard = Leaderboard(api_url=self.api_url, session=self.session)
         self.maps = Maps(api_url=self.api_url, session=self.session)
         self.monsters = Monsters(api_url=self.api_url, session=self.session)
         self.npcs = Npcs(api_url=self.api_url, session=self.session)
