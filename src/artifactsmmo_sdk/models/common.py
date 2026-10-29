@@ -6,6 +6,42 @@ from enum import Enum
 from pydantic import BaseModel
 
 
+class ConditionOperator(str, Enum):
+    """ConditionOperator."""
+
+    EQ = "eq"
+    NE = "ne"
+    GT = "gt"
+    LT = "lt"
+    COST = "cost"
+    HAS_ITEM = "has_item"
+    ACHIEVEMENT_UNLOCKED = "achievement_unlocked"
+
+
+class ConditionSchema(BaseModel):
+    """ConditionSchema"""
+
+    code: str
+    operator: ConditionOperator
+    value: int
+
+
+class MapAccessType(str, Enum):
+    """MapAccessType."""
+
+    STANDARD = "standard"
+    RESTRICTED = "restricted"
+    CONDITIONAL = "conditional"
+    BLOCKED = "blocked"
+
+
+class AccessSchema(BaseModel):
+    """AccessSchema"""
+
+    type: MapAccessType
+    conditions: list[ConditionSchema] | None = None
+
+
 class AccountStatus(str, Enum):
     """AccountStatus."""
 
@@ -207,6 +243,56 @@ class GEOrderSchemaPage(BaseModel):
     page: int
     size: int
     pages: int
+
+
+class MapContentType(str, Enum):
+    """MapContentType."""
+
+    MONSTER = "monster"
+    RESOURCE = "resource"
+    WORKSHOP = "workshop"
+    BANK = "bank"
+    GRAND_EXCHANGE = "grand_exchange"
+    TASKS_MASTER = "tasks_master"
+    NPC = "npc"
+    RAID = "raid"
+
+
+class MapContentSchema(BaseModel):
+    """MapContentSchema"""
+
+    type: MapContentType
+    code: str
+
+
+class TransitionSchema(BaseModel):
+    """TransitionSchema"""
+
+    map_id: int
+    x: int
+    y: int
+    layer: MapLayer
+    conditions: list[ConditionSchema] | None = None
+
+
+class InteractionSchema(BaseModel):
+    """InteractionSchema"""
+
+    content: MapContentSchema | None = None
+    transition: TransitionSchema | None = None
+
+
+class MapSchema(BaseModel):
+    """MapSchema"""
+
+    map_id: int
+    name: str
+    skin: str
+    x: int
+    y: int
+    layer: MapLayer
+    access: AccessSchema
+    interactions: InteractionSchema
 
 
 class PendingItemSource(str, Enum):
