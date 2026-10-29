@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.actions import (
+    BankExtensionTransactionResponseSchema,
     BankGoldTransactionResponseSchema,
     BankItemTransactionResponseSchema,
     CharacterFightResponseSchema,
@@ -354,5 +355,24 @@ class Actions(BaseModule):
             },
             json={
                 "quantity": quantity,
+            },
+        )
+
+    def buy_bank_expansion(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, BankExtensionTransactionResponseSchema | None]:
+        """Buy a 20 slots bank expansion."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/bank/buy_expansion",
+            BankExtensionTransactionResponseSchema,
+            "Bank expansion successfully bought.",
+            {
+                492: "The character does not have enough gold.",
+                598: "Bank not found on this map.",
             },
         )

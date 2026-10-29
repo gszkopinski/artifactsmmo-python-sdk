@@ -56,6 +56,12 @@ class ActionType(str, Enum):
     SANDBOX_TELEPORT = "sandbox_teleport"
 
 
+class BankExtensionSchema(BaseModel):
+    """BankExtensionSchema"""
+
+    price: int
+
+
 class CooldownSchema(BaseModel):
     """CooldownSchema"""
 
@@ -64,6 +70,20 @@ class CooldownSchema(BaseModel):
     started_at: datetime
     expiration: datetime
     reason: ActionType
+
+
+class BankExtensionTransactionSchema(BaseModel):
+    """BankExtensionTransactionSchema"""
+
+    cooldown: CooldownSchema
+    transaction: BankExtensionSchema
+    character: CharacterSchema
+
+
+class BankExtensionTransactionResponseSchema(BaseModel):
+    """BankExtensionTransactionResponseSchema"""
+
+    data: BankExtensionTransactionSchema
 
 
 class GoldSchema(BaseModel):
