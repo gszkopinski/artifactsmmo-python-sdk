@@ -404,3 +404,29 @@ class Actions(BaseModule):
                 "quantity": quantity,
             },
         )
+
+    def npc_sell_item(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        code: Annotated[str, Field(description="Item code.")],
+        quantity: Annotated[int, Field(description="Item quantity.", ge=1)],
+    ) -> tuple[str, NpcMerchantTransactionResponseSchema | None]:
+        """Sell an item to an NPC on the character's map."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/npc/sell",
+            NpcMerchantTransactionResponseSchema,
+            "Item successfully sold to the NPC.",
+            {
+                404: "Item not found.",
+                441: "This item is not available to be sold.",
+                598: "NPC not found on this map.",
+            },
+            json={
+                "code": code,
+                "quantity": quantity,
+            },
+        )
