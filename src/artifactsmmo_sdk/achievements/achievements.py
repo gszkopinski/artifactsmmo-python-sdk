@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.achievements import (
+    AchievementResponseSchema,
     StaticDataPage_AchievementSchema_,
 )
 from ..models.common import (
@@ -34,5 +35,25 @@ class Achievements(BaseModule):
                 "type": type,
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_achievement(
+        self,
+        code: Annotated[
+            str,
+            Field(
+                description="The code of the achievement.", pattern="^[a-zA-Z0-9_-]+$"
+            ),
+        ],
+    ) -> tuple[str, AchievementResponseSchema | None]:
+        """Retrieve the details of an achievement."""
+        return self._request(
+            "GET",
+            f"/achievements/{code}",
+            AchievementResponseSchema,
+            "Successfully fetched achievement.",
+            {
+                404: "achievement not found.",
             },
         )

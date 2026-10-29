@@ -24,6 +24,12 @@ class AchievementSchema(BaseModel):
     rewards: AchievementRewardsSchema
 
 
+class AchievementResponseSchema(BaseModel):
+    """AchievementResponseSchema"""
+
+    data: AchievementSchema
+
+
 class StaticDataPage_AchievementSchema_(BaseModel):
     """StaticDataPage[AchievementSchema]"""
 
