@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.gems_shop import (
+    ActiveEventResponseSchema,
     BuySkinResponseSchema,
     GemShopCatalogResponseSchema,
 )
@@ -40,6 +41,28 @@ class GemsShop(BaseModule):
                 551: "You already own this skin.",
                 552: "This skin is not available for purchase.",
                 563: "Insufficient gems.",
+            },
+            json={
+                "code": code,
+            },
+        )
+
+    def buy_spawn_event(
+        self,
+        code: Annotated[str, Field(description="Code of the event to spawn")],
+    ) -> tuple[str, ActiveEventResponseSchema | None]:
+        """Spawn an event from the gems shop using gems."""
+        return self._request(
+            "POST",
+            "/gems_shop/spawn_event",
+            ActiveEventResponseSchema,
+            "Successfully fetched data.",
+            {
+                404: "Event not found.",
+                563: "Insufficient gems.",
+                564: "Event already active or maximum active events reached.",
+                566: "This event is on cooldown and cannot be spawned yet.",
+                571: "This event is not available for purchase.",
             },
             json={
                 "code": code,

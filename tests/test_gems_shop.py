@@ -58,3 +58,74 @@ def test_buy_skin(client, respond):
 def test_buy_skin_error(client, respond):
     respond(404)
     assert client.gems_shop.buy_skin(code="x") == ("Skin not found.", None)
+
+
+def test_buy_spawn_event(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "name": "x",
+                "code": "x",
+                "map": {
+                    "map_id": 1,
+                    "name": "x",
+                    "skin": "x",
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "access": {
+                        "type": "standard",
+                        "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                    },
+                    "interactions": {
+                        "content": {"type": "monster", "code": "x"},
+                        "transition": {
+                            "map_id": 1,
+                            "x": 1,
+                            "y": 1,
+                            "layer": "interior",
+                            "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                        },
+                    },
+                },
+                "previous_map": {
+                    "map_id": 1,
+                    "name": "x",
+                    "skin": "x",
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "access": {
+                        "type": "standard",
+                        "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                    },
+                    "interactions": {
+                        "content": {"type": "monster", "code": "x"},
+                        "transition": {
+                            "map_id": 1,
+                            "x": 1,
+                            "y": 1,
+                            "layer": "interior",
+                            "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                        },
+                    },
+                },
+                "duration": 1,
+                "expiration": "2024-01-01T00:00:00Z",
+                "created_at": "2024-01-01T00:00:00Z",
+            }
+        },
+    )
+    message, data = client.gems_shop.buy_spawn_event(code="x")
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/gems_shop/spawn_event",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"code": "x"}
+
+
+def test_buy_spawn_event_error(client, respond):
+    respond(404)
+    assert client.gems_shop.buy_spawn_event(code="x") == ("Event not found.", None)

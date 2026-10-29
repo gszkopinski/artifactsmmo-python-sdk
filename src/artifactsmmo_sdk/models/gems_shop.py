@@ -4,7 +4,13 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from .common import MapContentType
+from .common import ActiveEventSchema, MapContentType
+
+
+class ActiveEventResponseSchema(BaseModel):
+    """ActiveEventResponseSchema"""
+
+    data: ActiveEventSchema
 
 
 class BuySkinResponseDataSchema(BaseModel):
