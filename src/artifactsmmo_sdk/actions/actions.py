@@ -932,3 +932,27 @@ class Actions(BaseModule):
                 "size": size,
             },
         )
+
+    def get_character_logs(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=100)] = 50,
+    ) -> tuple[str, LogSchemaPage | None]:
+        """History of the last actions of your character."""
+        return self._request(
+            "GET",
+            f"/my/logs/{name}",
+            LogSchemaPage,
+            "Successfully fetched logs.",
+            {
+                404: "Logs not found.",
+            },
+            params={
+                "page": page,
+                "size": size,
+            },
+        )
