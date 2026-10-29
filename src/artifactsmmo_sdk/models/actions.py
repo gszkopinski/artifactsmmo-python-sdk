@@ -433,6 +433,21 @@ class RecyclingResponseSchema(BaseModel):
     data: RecyclingDataSchema
 
 
+class RenameCharacterDataSchema(BaseModel):
+    """RenameCharacterDataSchema"""
+
+    cooldown: CooldownSchema
+    old_name: str
+    new_name: str
+    character: CharacterSchema
+
+
+class RenameResponseSchema(BaseModel):
+    """RenameResponseSchema"""
+
+    data: RenameCharacterDataSchema
+
+
 class RewardDataSchema(BaseModel):
     """RewardDataSchema"""
 

@@ -24,6 +24,7 @@ from ..models.actions import (
     GiveItemResponseSchema,
     NpcMerchantTransactionResponseSchema,
     RecyclingResponseSchema,
+    RenameResponseSchema,
     RewardDataResponseSchema,
     SkillResponseSchema,
     TaskCancelledResponseSchema,
@@ -875,5 +876,38 @@ class Actions(BaseModule):
             },
             json={
                 "skin": skin,
+            },
+        )
+
+    def rename(
+        self,
+        name: Annotated[
+            str,
+            Field(
+                description="Current name of your character.",
+                pattern="^[a-zA-Z0-9_-]+$",
+            ),
+        ],
+        new_name: Annotated[
+            str,
+            Field(
+                description="Your desired character name. It's unique and all players can see it.",
+                pattern="^[a-zA-Z0-9_-]+$",
+            ),
+        ],
+    ) -> tuple[str, RenameResponseSchema | None]:
+        """Rename a character. An active membership is required."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/rename",
+            RenameResponseSchema,
+            "Character successfully renamed.",
+            {
+                404: "Character not found.",
+                451: "Access denied, you must be a member to do that.",
+                494: "This name is already in use.",
+            },
+            json={
+                "name": new_name,
             },
         )
