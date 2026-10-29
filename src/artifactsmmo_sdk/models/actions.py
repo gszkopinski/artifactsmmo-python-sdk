@@ -463,6 +463,12 @@ class GiveItemResponseSchema(BaseModel):
     data: GiveItemDataSchema
 
 
+class MyCharactersListSchema(BaseModel):
+    """MyCharactersListSchema"""
+
+    data: list[CharacterSchema]
+
+
 class NpcItemTransactionSchema(BaseModel):
     """NpcItemTransactionSchema"""
 

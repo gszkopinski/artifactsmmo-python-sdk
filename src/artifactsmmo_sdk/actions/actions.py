@@ -23,6 +23,7 @@ from ..models.actions import (
     GiveGoldResponseSchema,
     GiveItemResponseSchema,
     LogSchemaPage,
+    MyCharactersListSchema,
     NpcMerchantTransactionResponseSchema,
     RecyclingResponseSchema,
     RenameResponseSchema,
@@ -955,4 +956,15 @@ class Actions(BaseModule):
                 "page": page,
                 "size": size,
             },
+        )
+
+    def get_my_characters(
+        self,
+    ) -> tuple[str, MyCharactersListSchema | None]:
+        """List of your characters."""
+        return self._request(
+            "GET",
+            "/my/characters",
+            MyCharactersListSchema,
+            "Successfully fetched data.",
         )
