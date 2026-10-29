@@ -402,3 +402,10 @@ class RewardType(str, Enum):
     SKIN = "skin"
     GOLD = "gold"
     ITEM = "item"
+
+
+class RewardsSchema(BaseModel):
+    """RewardsSchema"""
+
+    items: list[SimpleItemSchema]
+    gold: int

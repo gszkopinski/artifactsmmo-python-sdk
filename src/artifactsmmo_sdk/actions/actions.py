@@ -19,6 +19,7 @@ from ..models.actions import (
     GETransactionResponseSchema,
     NpcMerchantTransactionResponseSchema,
     RecyclingResponseSchema,
+    RewardDataResponseSchema,
     SkillResponseSchema,
     UnequipSchema,
     UseItemResponseSchema,
@@ -628,5 +629,25 @@ class Actions(BaseModule):
             json={
                 "id": id,
                 "quantity": quantity,
+            },
+        )
+
+    def complete_task(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, RewardDataResponseSchema | None]:
+        """Complete a task."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/task/complete",
+            RewardDataResponseSchema,
+            "The task has been successfully completed.",
+            {
+                487: "The character has no task assigned.",
+                488: "The character has not completed the task.",
+                598: "Tasks Master not found on this map.",
             },
         )

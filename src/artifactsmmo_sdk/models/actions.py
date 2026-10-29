@@ -9,6 +9,7 @@ from .common import (
     CharacterSchema,
     ItemSchema,
     MapSchema,
+    RewardsSchema,
     SimpleItemSchema,
     TransitionSchema,
 )
@@ -356,6 +357,20 @@ class RecyclingResponseSchema(BaseModel):
     """RecyclingResponseSchema"""
 
     data: RecyclingDataSchema
+
+
+class RewardDataSchema(BaseModel):
+    """RewardDataSchema"""
+
+    cooldown: CooldownSchema
+    rewards: RewardsSchema
+    character: CharacterSchema
+
+
+class RewardDataResponseSchema(BaseModel):
+    """RewardDataResponseSchema"""
+
+    data: RewardDataSchema
 
 
 class SkillInfoSchema(BaseModel):
