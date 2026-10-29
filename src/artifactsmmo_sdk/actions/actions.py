@@ -15,6 +15,7 @@ from ..models.actions import (
     CharacterTransitionResponseSchema,
     EquipmentResponseSchema,
     EquipSchema,
+    GETransactionResponseSchema,
     NpcMerchantTransactionResponseSchema,
     RecyclingResponseSchema,
     SkillResponseSchema,
@@ -465,5 +466,34 @@ class Actions(BaseModule):
                 "code": code,
                 "quantity": quantity,
                 "enhanced": enhanced,
+            },
+        )
+
+    def ge_buy_item(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        id: Annotated[str, Field(description="Order id.")],
+        quantity: Annotated[int, Field(description="Item quantity.", ge=1, le=100)],
+    ) -> tuple[str, GETransactionResponseSchema | None]:
+        """Buy an item at the Grand Exchange on the character's map."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/grandexchange/buy",
+            GETransactionResponseSchema,
+            "Item successfully bought from the Grand Exchange.",
+            {
+                404: "Order not found.",
+                434: "This offer does not contain that many items.",
+                435: "You cannot trade with yourself.",
+                436: "A transaction is already in progress for this order by another character.",
+                492: "The character does not have enough gold.",
+                598: "Grand Exchange not found on this map.",
+            },
+            json={
+                "id": id,
+                "quantity": quantity,
             },
         )

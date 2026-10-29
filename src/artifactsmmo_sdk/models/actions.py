@@ -263,6 +263,30 @@ class EquipmentResponseSchema(BaseModel):
     data: EquipmentTransactionSchema
 
 
+class GETransactionSchema(BaseModel):
+    """GETransactionSchema"""
+
+    id: str
+    code: str
+    quantity: int
+    price: int
+    total_price: int
+
+
+class GETransactionListSchema(BaseModel):
+    """GETransactionListSchema"""
+
+    cooldown: CooldownSchema
+    order: GETransactionSchema
+    character: CharacterSchema
+
+
+class GETransactionResponseSchema(BaseModel):
+    """GETransactionResponseSchema"""
+
+    data: GETransactionListSchema
+
+
 class NpcItemTransactionSchema(BaseModel):
     """NpcItemTransactionSchema"""
 
