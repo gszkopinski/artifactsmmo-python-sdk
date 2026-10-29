@@ -11,6 +11,7 @@ from ..models.accounts import (
 )
 from ..models.common import (
     AchievementType,
+    ResponseSchema,
 )
 
 
@@ -62,4 +63,31 @@ class Accounts(BaseModule):
             f"/accounts/{account}/characters",
             CharactersListSchema,
             "Successfully fetched account characters.",
+        )
+
+    def create_account(
+        self,
+        username: Annotated[
+            str, Field(description="Your desired username.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+        password: Annotated[
+            str, Field(description="Your password.", pattern="^[^\\s]+$")
+        ],
+        email: Annotated[str, Field(description="Your email.")],
+    ) -> tuple[str, ResponseSchema | None]:
+        """Create Account"""
+        return self._request(
+            "POST",
+            "/accounts/create",
+            ResponseSchema,
+            "Account created successfully.",
+            {
+                456: "This username is already taken.",
+                457: "This email is already in use.",
+            },
+            json={
+                "username": username,
+                "password": password,
+                "email": email,
+            },
         )

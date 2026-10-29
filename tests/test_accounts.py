@@ -149,3 +149,27 @@ def test_get_account_characters(client, respond):
         "GET",
         "http://api.test/accounts/x/characters",
     )
+
+
+def test_create_account(client, respond):
+    respond(200, {"message": "x"})
+    message, data = client.accounts.create_account(
+        username="x", password="x", email="a@b.co"
+    )
+    assert (message, data is not None) == ("Account created successfully.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/accounts/create",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "username": "x",
+        "password": "x",
+        "email": "a@b.co",
+    }
+
+
+def test_create_account_error(client, respond):
+    respond(456)
+    assert client.accounts.create_account(
+        username="x", password="x", email="a@b.co"
+    ) == ("This username is already taken.", None)
