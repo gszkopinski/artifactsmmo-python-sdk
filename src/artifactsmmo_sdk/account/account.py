@@ -8,6 +8,7 @@ from ..base import BaseModule
 from ..models.account import (
     BankResponseSchema,
     CheckoutResponseWrapperSchema,
+    MemberTokenSubscriptionResponseSchema,
     MyAccountDetailsSchema,
     PendingItemSchemaPage,
     RateLimitsSchema,
@@ -249,5 +250,22 @@ class Account(BaseModule):
             json={
                 "plan": plan,
                 "recurring": recurring,
+            },
+        )
+
+    def subscribe_with_member_token(
+        self,
+    ) -> tuple[str, MemberTokenSubscriptionResponseSchema | None]:
+        """Redeem a member token to start or extend membership by 30 days.
+        Member tokens are manually granted as rewards for events.
+        Member tokens cannot be redeemed while a Stripe subscription is active."""
+        return self._request(
+            "POST",
+            "/my/subscribe/member_token",
+            MemberTokenSubscriptionResponseSchema,
+            "Successfully fetched data.",
+            {
+                572: "Insufficient member tokens.",
+                573: "An active Stripe subscription cannot be extended with gems or member tokens.",
             },
         )

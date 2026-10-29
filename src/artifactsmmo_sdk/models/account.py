@@ -62,6 +62,20 @@ class SimpleItemSchemaPage(BaseModel):
     pages: int
 
 
+class MemberTokenSubscriptionResponseDataSchema(BaseModel):
+    """MemberTokenSubscriptionResponseDataSchema"""
+
+    member: bool
+    member_expiration: datetime
+    member_token: int
+
+
+class MemberTokenSubscriptionResponseSchema(BaseModel):
+    """MemberTokenSubscriptionResponseSchema"""
+
+    data: MemberTokenSubscriptionResponseDataSchema
+
+
 class MyAccountDetails(BaseModel):
     """MyAccountDetails"""
 

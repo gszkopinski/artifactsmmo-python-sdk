@@ -367,3 +367,30 @@ def test_subscribe_with_stripe_error(client, respond):
         "You already have an active subscription.",
         None,
     )
+
+
+def test_subscribe_with_member_token(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "member": True,
+                "member_expiration": "2024-01-01T00:00:00Z",
+                "member_token": 1,
+            }
+        },
+    )
+    message, data = client.account.subscribe_with_member_token()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/subscribe/member_token",
+    )
+
+
+def test_subscribe_with_member_token_error(client, respond):
+    respond(572)
+    assert client.account.subscribe_with_member_token() == (
+        "Insufficient member tokens.",
+        None,
+    )
