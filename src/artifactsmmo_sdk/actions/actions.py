@@ -651,3 +651,21 @@ class Actions(BaseModule):
                 598: "Tasks Master not found on this map.",
             },
         )
+
+    def task_exchange(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, RewardDataResponseSchema | None]:
+        """Exchange 6 tasks coins for a random reward. Rewards are exclusive items or resources."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/task/exchange",
+            RewardDataResponseSchema,
+            "The tasks coins have been successfully exchanged.",
+            {
+                598: "Tasks Master not found on this map.",
+            },
+        )
