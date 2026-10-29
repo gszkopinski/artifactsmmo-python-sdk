@@ -249,3 +249,36 @@ def test_get_character_stats_error(client, respond):
         "character stats not found.",
         None,
     )
+
+
+def test_get_active_characters(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                }
+            ],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.characters.get_active_characters()
+    assert (message, data is not None) == (
+        "Successfully fetched active characters.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/characters/active",
+    )
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}

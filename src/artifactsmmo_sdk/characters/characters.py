@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.characters import (
+    ActiveCharacterSchemaPage,
     CharacterResponseSchema,
     CharacterStatsResponseSchema,
 )
@@ -78,5 +79,22 @@ class Characters(BaseModule):
             "Successfully fetched character stats.",
             {
                 404: "character stats not found.",
+            },
+        )
+
+    def get_active_characters(
+        self,
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=100)] = 50,
+    ) -> tuple[str, ActiveCharacterSchemaPage | None]:
+        """Fetch active characters details."""
+        return self._request(
+            "GET",
+            "/characters/active",
+            ActiveCharacterSchemaPage,
+            "Successfully fetched active characters.",
+            params={
+                "page": page,
+                "size": size,
             },
         )
