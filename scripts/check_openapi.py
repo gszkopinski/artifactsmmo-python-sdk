@@ -21,6 +21,8 @@ from artifactsmmo_sdk import ArtifactsClient  # noqa: F401  (imports all models)
 from artifactsmmo_sdk import models as _models  # noqa: F401
 from artifactsmmo_sdk.base import COMMON_ERRORS
 
+# Not built on BaseModule._request (HTTP Basic auth, see token/token.py).
+HAND_WRITTEN = {("POST", "/token")}
 SPEC_URL = "https://api.artifactsmmo.com/openapi.json"
 SRC = Path(__file__).parent.parent / "src" / "artifactsmmo_sdk"
 
@@ -153,7 +155,7 @@ def main() -> int:
     print(
         f"spec {spec['info']['version']}: {len(spec_ops)} operations, SDK: {len(calls)}"
     )
-    for key in sorted(spec_ops.keys() - calls.keys()):
+    for key in sorted(spec_ops.keys() - calls.keys() - HAND_WRITTEN):
         gaps.append(f"MISSING {key[0]} {spec_ops[key][0]}")
     for key in sorted(calls.keys() - spec_ops.keys()):
         gaps.append(f"NOT IN SPEC {key[0]} {key[1]} ({calls[key]['file']})")
