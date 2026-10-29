@@ -230,6 +230,20 @@ class ClaimPendingItemResponseSchema(BaseModel):
     data: ClaimPendingItemDataSchema
 
 
+class DeleteItemSchema(BaseModel):
+    """DeleteItemSchema"""
+
+    cooldown: CooldownSchema
+    item: SimpleItemSchema
+    character: CharacterSchema
+
+
+class DeleteItemResponseSchema(BaseModel):
+    """DeleteItemResponseSchema"""
+
+    data: DeleteItemSchema
+
+
 class ItemSlot(str, Enum):
     """ItemSlot."""
 

@@ -14,6 +14,7 @@ from ..models.actions import (
     CharacterRestResponseSchema,
     CharacterTransitionResponseSchema,
     ClaimPendingItemResponseSchema,
+    DeleteItemResponseSchema,
     EquipmentResponseSchema,
     EquipSchema,
     GECreateOrderTransactionResponseSchema,
@@ -827,5 +828,28 @@ class Actions(BaseModule):
             "Successfully claimed the pending item.",
             {
                 404: "Pending item not found.",
+            },
+        )
+
+    def delete_item(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        code: Annotated[
+            str, Field(description="Item code.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+        quantity: Annotated[int, Field(description="Item quantity.", ge=1)],
+    ) -> tuple[str, DeleteItemResponseSchema | None]:
+        """Delete an item from your character's inventory."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/delete",
+            DeleteItemResponseSchema,
+            "Item successfully deleted from your character.",
+            json={
+                "code": code,
+                "quantity": quantity,
             },
         )
