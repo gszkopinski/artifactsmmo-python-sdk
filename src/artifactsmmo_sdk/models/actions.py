@@ -50,6 +50,36 @@ class ActionType(str, Enum):
     SANDBOX_TELEPORT = "sandbox_teleport"
 
 
+class CooldownSchema(BaseModel):
+    """CooldownSchema"""
+
+    total_seconds: int
+    remaining_seconds: int
+    started_at: datetime
+    expiration: datetime
+    reason: ActionType
+
+
+class GoldSchema(BaseModel):
+    """GoldSchema"""
+
+    quantity: int
+
+
+class BankGoldTransactionSchema(BaseModel):
+    """BankGoldTransactionSchema"""
+
+    cooldown: CooldownSchema
+    bank: GoldSchema
+    character: CharacterSchema
+
+
+class BankGoldTransactionResponseSchema(BaseModel):
+    """BankGoldTransactionResponseSchema"""
+
+    data: BankGoldTransactionSchema
+
+
 class DropSchema(BaseModel):
     """DropSchema"""
 
@@ -82,16 +112,6 @@ class CharacterFightSchema(BaseModel):
     opponent: str
     logs: list[str]
     characters: list[CharacterMultiFightResultSchema]
-
-
-class CooldownSchema(BaseModel):
-    """CooldownSchema"""
-
-    total_seconds: int
-    remaining_seconds: int
-    started_at: datetime
-    expiration: datetime
-    reason: ActionType
 
 
 class CharacterFightDataSchema(BaseModel):

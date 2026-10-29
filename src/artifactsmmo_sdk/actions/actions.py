@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.actions import (
+    BankGoldTransactionResponseSchema,
     CharacterFightResponseSchema,
     CharacterMovementResponseSchema,
     CharacterRestResponseSchema,
@@ -250,6 +251,30 @@ class Actions(BaseModule):
             },
             json={
                 "code": code,
+                "quantity": quantity,
+            },
+        )
+
+    def deposit_bank_gold(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        quantity: Annotated[int, Field(description="Quantity of gold.", ge=1)],
+    ) -> tuple[str, BankGoldTransactionResponseSchema | None]:
+        """Deposit gold in a bank on the character's map."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/bank/deposit/gold",
+            BankGoldTransactionResponseSchema,
+            "Golds successfully deposited in your bank.",
+            {
+                461: "Some of your items or your gold in the bank are already part of an ongoing transaction.",
+                492: "The character does not have enough gold.",
+                598: "Bank not found on this map.",
+            },
+            json={
                 "quantity": quantity,
             },
         )
