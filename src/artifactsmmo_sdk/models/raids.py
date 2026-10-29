@@ -8,6 +8,24 @@ from pydantic import BaseModel
 from .common import SimpleItemSchema
 
 
+class RaidLeaderboardEntrySchema(BaseModel):
+    """RaidLeaderboardEntrySchema"""
+
+    position: int
+    account: str
+    points: int
+
+
+class RaidLeaderboardEntrySchemaPage(BaseModel):
+    """DataPage[RaidLeaderboardEntrySchema]"""
+
+    data: list[RaidLeaderboardEntrySchema]
+    total: int
+    page: int
+    size: int
+    pages: int
+
+
 class RaidDamageRewardSchema(BaseModel):
     """RaidDamageRewardSchema"""
 

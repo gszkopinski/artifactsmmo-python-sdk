@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.raids import (
+    RaidLeaderboardEntrySchemaPage,
     RaidResponseSchema,
     StaticDataPage_RaidSchema_,
 )
@@ -57,5 +58,25 @@ class Raids(BaseModule):
             "Successfully fetched raid.",
             {
                 404: "raid not found.",
+            },
+        )
+
+    def get_raid_leaderboard(
+        self,
+        code: Annotated[
+            str, Field(description="The code of the raid.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=100)] = 50,
+    ) -> tuple[str, RaidLeaderboardEntrySchemaPage | None]:
+        """Retrieve the leaderboard for the active or latest raid instance."""
+        return self._request(
+            "GET",
+            f"/raids/{code}/leaderboard",
+            RaidLeaderboardEntrySchemaPage,
+            "Successfully fetched raid leaderboard.",
+            params={
+                "page": page,
+                "size": size,
             },
         )

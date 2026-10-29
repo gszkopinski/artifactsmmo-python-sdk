@@ -139,3 +139,26 @@ def test_get_raid(client, respond):
 def test_get_raid_error(client, respond):
     respond(404)
     assert client.raids.get_raid(code="x") == ("raid not found.", None)
+
+
+def test_get_raid_leaderboard(client, respond):
+    respond(
+        200,
+        {
+            "data": [{"position": 1, "account": "x", "points": 1}],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.raids.get_raid_leaderboard(code="x")
+    assert (message, data is not None) == (
+        "Successfully fetched raid leaderboard.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/raids/x/leaderboard",
+    )
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
