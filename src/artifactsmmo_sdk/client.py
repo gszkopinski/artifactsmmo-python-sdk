@@ -19,6 +19,7 @@ from .leaderboard import Leaderboard
 from .maps import Maps
 from .monsters import Monsters
 from .npcs import Npcs
+from .raids import Raids
 from .resources import Resources
 from .season_rewards import SeasonRewards
 from .server import Server
@@ -64,6 +65,7 @@ class ArtifactsClient:
         self.maps = Maps(api_url=self.api_url, session=self.session)
         self.monsters = Monsters(api_url=self.api_url, session=self.session)
         self.npcs = Npcs(api_url=self.api_url, session=self.session)
+        self.raids = Raids(api_url=self.api_url, session=self.session)
         self.resources = Resources(api_url=self.api_url, session=self.session)
         self.season_rewards = SeasonRewards(api_url=self.api_url, session=self.session)
         self.server = Server(api_url=self.api_url, session=self.session)
