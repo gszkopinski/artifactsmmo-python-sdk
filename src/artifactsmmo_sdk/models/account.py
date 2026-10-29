@@ -1,6 +1,8 @@
 """Account schemas."""
 
 from datetime import datetime
+from enum import Enum
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -84,3 +86,29 @@ class RateLimitsSchema(BaseModel):
     """RateLimitsSchema"""
 
     data: RateLimitsDataSchema
+
+
+class SubscriptionPlan(str, Enum):
+    """SubscriptionPlan."""
+
+    MONTHLY = "monthly"
+    ANNUAL = "annual"
+    PREPAID = "prepaid"
+
+
+class SubscriptionSchema(BaseModel):
+    """SubscriptionSchema"""
+
+    plan: SubscriptionPlan
+    purchase_source: Literal["stripe", "gems", "member_token", "mixed"]
+    status: str
+    current_period_start: datetime
+    current_period_end: datetime
+    created_at: datetime
+    cancelled_at: datetime | None = None
+
+
+class SubscriptionResponseSchema(BaseModel):
+    """SubscriptionResponseSchema"""
+
+    data: SubscriptionSchema

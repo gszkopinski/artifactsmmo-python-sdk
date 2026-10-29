@@ -320,3 +320,31 @@ def test_change_email_error(client, respond):
         "This email is already in use.",
         None,
     )
+
+
+def test_get_my_subscription(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "plan": "monthly",
+                "purchase_source": "stripe",
+                "status": "x",
+                "current_period_start": "2024-01-01T00:00:00Z",
+                "current_period_end": "2024-01-01T00:00:00Z",
+                "created_at": "2024-01-01T00:00:00Z",
+                "cancelled_at": "2024-01-01T00:00:00Z",
+            }
+        },
+    )
+    message, data = client.account.get_my_subscription()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/subscription",
+    )
+
+
+def test_get_my_subscription_error(client, respond):
+    respond(404)
+    assert client.account.get_my_subscription() == ("Subscription not found.", None)

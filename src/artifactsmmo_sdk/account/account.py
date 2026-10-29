@@ -11,6 +11,7 @@ from ..models.account import (
     PendingItemSchemaPage,
     RateLimitsSchema,
     SimpleItemSchemaPage,
+    SubscriptionResponseSchema,
 )
 from ..models.common import (
     GEOrderHistorySchemaPage,
@@ -202,5 +203,19 @@ class Account(BaseModule):
             json={
                 "current_email": current_email,
                 "new_email": new_email,
+            },
+        )
+
+    def get_my_subscription(
+        self,
+    ) -> tuple[str, SubscriptionResponseSchema | None]:
+        """Get current subscription details."""
+        return self._request(
+            "GET",
+            "/my/subscription",
+            SubscriptionResponseSchema,
+            "Successfully fetched data.",
+            {
+                404: "Subscription not found.",
             },
         )
