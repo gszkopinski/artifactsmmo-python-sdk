@@ -23,6 +23,7 @@ from .raids import Raids
 from .resources import Resources
 from .season_rewards import SeasonRewards
 from .server import Server
+from .simulation import Simulation
 from .skins import Skins
 from .tasks import Tasks
 from .token import Token
@@ -69,6 +70,7 @@ class ArtifactsClient:
         self.resources = Resources(api_url=self.api_url, session=self.session)
         self.season_rewards = SeasonRewards(api_url=self.api_url, session=self.session)
         self.server = Server(api_url=self.api_url, session=self.session)
+        self.simulation = Simulation(api_url=self.api_url, session=self.session)
         self.skins = Skins(api_url=self.api_url, session=self.session)
         self.tasks = Tasks(api_url=self.api_url, session=self.session)
         self.token = Token(api_url=self.api_url, session=self.session)
