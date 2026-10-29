@@ -263,6 +263,30 @@ class EquipmentResponseSchema(BaseModel):
     data: EquipmentTransactionSchema
 
 
+class NpcItemTransactionSchema(BaseModel):
+    """NpcItemTransactionSchema"""
+
+    code: str
+    quantity: int
+    currency: str
+    price: int
+    total_price: int
+
+
+class NpcMerchantTransactionSchema(BaseModel):
+    """NpcMerchantTransactionSchema"""
+
+    cooldown: CooldownSchema
+    transaction: NpcItemTransactionSchema
+    character: CharacterSchema
+
+
+class NpcMerchantTransactionResponseSchema(BaseModel):
+    """NpcMerchantTransactionResponseSchema"""
+
+    data: NpcMerchantTransactionSchema
+
+
 class SkillInfoSchema(BaseModel):
     """SkillInfoSchema"""
 

@@ -15,6 +15,7 @@ from ..models.actions import (
     CharacterTransitionResponseSchema,
     EquipmentResponseSchema,
     EquipSchema,
+    NpcMerchantTransactionResponseSchema,
     SkillResponseSchema,
     UnequipSchema,
     UseItemResponseSchema,
@@ -374,5 +375,32 @@ class Actions(BaseModule):
             {
                 492: "The character does not have enough gold.",
                 598: "Bank not found on this map.",
+            },
+        )
+
+    def npc_buy_item(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        code: Annotated[str, Field(description="Item code.")],
+        quantity: Annotated[int, Field(description="Item quantity.", ge=1)],
+    ) -> tuple[str, NpcMerchantTransactionResponseSchema | None]:
+        """Buy an item from an NPC on the character's map."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/npc/buy",
+            NpcMerchantTransactionResponseSchema,
+            "Item successfully bought from the NPC.",
+            {
+                404: "Item not found.",
+                441: "This item is not available for purchase.",
+                492: "The character does not have enough gold.",
+                598: "NPC not found on this map.",
+            },
+            json={
+                "code": code,
+                "quantity": quantity,
             },
         )
