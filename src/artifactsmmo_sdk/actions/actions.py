@@ -21,6 +21,7 @@ from ..models.actions import (
     RecyclingResponseSchema,
     RewardDataResponseSchema,
     SkillResponseSchema,
+    TaskResponseSchema,
     UnequipSchema,
     UseItemResponseSchema,
 )
@@ -666,6 +667,25 @@ class Actions(BaseModule):
             RewardDataResponseSchema,
             "The tasks coins have been successfully exchanged.",
             {
+                598: "Tasks Master not found on this map.",
+            },
+        )
+
+    def accept_new_task(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, TaskResponseSchema | None]:
+        """Accepting a new task."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/task/new",
+            TaskResponseSchema,
+            "New task successfully accepted.",
+            {
+                489: "The character already has an assigned task.",
                 598: "Tasks Master not found on this map.",
             },
         )

@@ -11,6 +11,7 @@ from .common import (
     MapSchema,
     RewardsSchema,
     SimpleItemSchema,
+    TaskType,
     TransitionSchema,
 )
 
@@ -392,6 +393,29 @@ class SkillResponseSchema(BaseModel):
     """SkillResponseSchema"""
 
     data: SkillDataSchema
+
+
+class TaskSchema(BaseModel):
+    """TaskSchema"""
+
+    code: str
+    type: TaskType
+    total: int
+    rewards: RewardsSchema
+
+
+class TaskDataSchema(BaseModel):
+    """TaskDataSchema"""
+
+    cooldown: CooldownSchema
+    task: TaskSchema
+    character: CharacterSchema
+
+
+class TaskResponseSchema(BaseModel):
+    """TaskResponseSchema"""
+
+    data: TaskDataSchema
 
 
 class UnequipSchema(BaseModel):

@@ -409,3 +409,10 @@ class RewardsSchema(BaseModel):
 
     items: list[SimpleItemSchema]
     gold: int
+
+
+class TaskType(str, Enum):
+    """TaskType."""
+
+    MONSTERS = "monsters"
+    ITEMS = "items"
