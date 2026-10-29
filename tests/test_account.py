@@ -1,64 +1,473 @@
-"""Test Account."""
-
-from icecream import ic
-
-from artifactsmmo_sdk import ArtifactsClient
+"""Unit tests of the account endpoints (mocked, no network)."""
 
 
-artifacts_client = ArtifactsClient()
+def test_get_bank_details(client, respond):
+    respond(
+        200,
+        {"data": {"slots": 1, "expansions": 1, "next_expansion_cost": 1, "gold": 1}},
+    )
+    message, data = client.account.get_bank_details()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == ("GET", "http://api.test/my/bank")
 
 
-# BANK
-def test_get_bank_details():
-    """Tests."""
-    result = artifacts_client.account.get_bank_details()
+def test_get_bank_items(client, respond):
+    respond(
+        200,
+        {
+            "data": [{"code": "x", "quantity": 1}],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.account.get_bank_items()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/bank/items",
+    )
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
 
-    assert result
-    ic(result)
+
+def test_get_ge_sell_orders(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "id": "x",
+                    "type": "sell",
+                    "account": "x",
+                    "code": "x",
+                    "quantity": 1,
+                    "price": 1,
+                    "created_at": "2024-01-01T00:00:00Z",
+                }
+            ],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.account.get_ge_sell_orders()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/grandexchange/orders",
+    )
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
 
 
-def test_get_bank_items():
-    """Tests."""
-    result = artifacts_client.account.get_bank_items(
-        item_code="iron_sword",
-        page=1,
-        size=10,
+def test_get_ge_sell_history(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "order_id": "x",
+                    "seller": "x",
+                    "buyer": "x",
+                    "code": "x",
+                    "quantity": 1,
+                    "price": 1,
+                    "sold_at": "2024-01-01T00:00:00Z",
+                }
+            ],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.account.get_ge_sell_history()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/grandexchange/history",
+    )
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
+
+
+def test_get_account_details(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "username": "x",
+                "email": "a@b.co",
+                "member": True,
+                "member_expiration": "2024-01-01T00:00:00Z",
+                "status": "standard",
+                "badges": ["x"],
+                "skins": ["x"],
+                "gems": 1,
+                "member_token": 1,
+                "achievements_points": 1,
+                "banned": True,
+                "ban_reason": "x",
+            }
+        },
+    )
+    message, data = client.account.get_account_details()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/details",
     )
 
-    assert result
-    ic(result)
+
+def test_get_pending_items(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "id": "x",
+                    "account": "x",
+                    "source": "achievement",
+                    "source_id": "x",
+                    "description": "x",
+                    "gold": 1,
+                    "items": [{"code": "x", "quantity": 1}],
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "claimed_at": "2024-01-01T00:00:00Z",
+                }
+            ],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.account.get_pending_items()
+    assert (message, data is not None) == ("Successfully fetched pending items.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/pending_items",
+    )
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
 
 
-# GRAND EXCHANGE
-def test_get_ge_sell_orders():
-    """Tests."""
-    result = artifacts_client.account.get_ge_sell_orders(
-        item_code="iron_sword",
-        page=1,
-        size=10,
+def test_get_rate_limits(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "account": {
+                    "second": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "minute": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "hour": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "day": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                },
+                "data": {
+                    "second": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "minute": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "hour": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "day": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                },
+                "action": {
+                    "second": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "minute": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "hour": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "day": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                },
+                "simulation": {
+                    "second": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "minute": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "hour": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "day": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                },
+                "assistant": {
+                    "second": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "minute": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "hour": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                    "day": {
+                        "limit": 1,
+                        "remaining": 1,
+                        "reset": "2024-01-01T00:00:00Z",
+                    },
+                },
+            }
+        },
+    )
+    message, data = client.account.get_rate_limits()
+    assert (message, data is not None) == ("Successfully fetched rate limits.", True)
+    assert client.session.request.call_args.args == ("GET", "http://api.test/my/rates")
+
+
+def test_change_password(client, respond):
+    respond(200, {"message": "x"})
+    message, data = client.account.change_password(
+        current_password="x", new_password="x"
+    )
+    assert (message, data is not None) == ("Password changed successfully.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/change_password",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "current_password": "x",
+        "new_password": "x",
+    }
+
+
+def test_change_password_error(client, respond):
+    respond(458)
+    assert client.account.change_password(current_password="x", new_password="x") == (
+        "Please use a different password.",
+        None,
     )
 
-    assert result
-    ic(result)
+
+def test_change_email(client, respond):
+    respond(200, {"message": "x"})
+    message, data = client.account.change_email(
+        current_email="a@b.co", new_email="a@b.co"
+    )
+    assert (message, data is not None) == ("Email changed successfully.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/change_email",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "current_email": "a@b.co",
+        "new_email": "a@b.co",
+    }
 
 
-def test_get_ge_sell_history():
-    """Tests."""
-    result = artifacts_client.account.get_ge_sell_history(
-        item_code="iron_sword",
-        id="order123",
-        page=1,
-        size=10,
+def test_change_email_error(client, respond):
+    respond(457)
+    assert client.account.change_email(current_email="a@b.co", new_email="a@b.co") == (
+        "This email is already in use.",
+        None,
     )
 
-    assert result
-    ic(result)
+
+def test_get_my_subscription(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "plan": "monthly",
+                "purchase_source": "stripe",
+                "status": "x",
+                "current_period_start": "2024-01-01T00:00:00Z",
+                "current_period_end": "2024-01-01T00:00:00Z",
+                "created_at": "2024-01-01T00:00:00Z",
+                "cancelled_at": "2024-01-01T00:00:00Z",
+            }
+        },
+    )
+    message, data = client.account.get_my_subscription()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/subscription",
+    )
 
 
-# ACCOUNT
-def test_get_account_details():
-    """Tests."""
-    result = artifacts_client.account.get_account_details()
+def test_get_my_subscription_error(client, respond):
+    respond(404)
+    assert client.account.get_my_subscription() == ("Subscription not found.", None)
 
-    assert result
-    ic(result)
+
+def test_subscribe_with_stripe(client, respond):
+    respond(200, {"data": {"checkout_url": "x", "session_id": "x"}})
+    message, data = client.account.subscribe_with_stripe(plan="monthly")
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/subscribe/stripe",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"plan": "monthly"}
+
+
+def test_subscribe_with_stripe_error(client, respond):
+    respond(565)
+    assert client.account.subscribe_with_stripe(plan="monthly") == (
+        "You already have an active subscription.",
+        None,
+    )
+
+
+def test_subscribe_with_member_token(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "member": True,
+                "member_expiration": "2024-01-01T00:00:00Z",
+                "member_token": 1,
+            }
+        },
+    )
+    message, data = client.account.subscribe_with_member_token()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/subscribe/member_token",
+    )
+
+
+def test_subscribe_with_member_token_error(client, respond):
+    respond(572)
+    assert client.account.subscribe_with_member_token() == (
+        "Insufficient member tokens.",
+        None,
+    )
+
+
+def test_cancel_subscription(client, respond):
+    respond(200, {"message": "x"})
+    message, data = client.account.cancel_subscription()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/subscribe/cancel",
+    )
+
+
+def test_cancel_subscription_error(client, respond):
+    respond(404)
+    assert client.account.cancel_subscription() == ("Subscription not found.", None)
+
+
+def test_get_my_purchase_history(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "type": "subscription",
+                    "description": "x",
+                    "amount": 1,
+                    "gems_credited": 1,
+                    "created_at": "2024-01-01T00:00:00Z",
+                }
+            ]
+        },
+    )
+    message, data = client.account.get_my_purchase_history()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/purchase_history",
+    )
+
+
+def test_get_my_gems_history(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "type": "x",
+                    "gems": 1,
+                    "description": "x",
+                    "metadata": {},
+                    "created_at": "2024-01-01T00:00:00Z",
+                }
+            ]
+        },
+    )
+    message, data = client.account.get_my_gems_history()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/gems_history",
+    )
+
+
+def test_buy_gems(client, respond):
+    respond(200, {"data": {"checkout_url": "x", "session_id": "x"}})
+    message, data = client.account.buy_gems(quantity=500)
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/buy_gems",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"quantity": 500}
+
+
+def test_buy_gems_error(client, respond):
+    respond(404)
+    assert client.account.buy_gems(quantity=500) == ("Gem pack not found.", None)

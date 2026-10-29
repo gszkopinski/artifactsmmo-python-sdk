@@ -1,151 +1,4555 @@
-"""Test Actions."""
-
-from time import sleep
-
-from icecream import ic
-
-from artifactsmmo_sdk import ArtifactsClient
-from artifactsmmo_sdk.models.actions import SlotEnum
-from artifactsmmo_sdk.models.characters import CharacterSkinEnum
+"""Unit tests of the actions endpoints (mocked, no network)."""
 
 
-artifacts_client = ArtifactsClient()
-
-
-def get_character_name():
-    """Get Character."""
-    error, character = artifacts_client.characters.get_character(
-        name="billy1",
+def test_move(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "destination": {
+                    "map_id": 1,
+                    "name": "x",
+                    "skin": "x",
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "access": {
+                        "type": "standard",
+                        "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                    },
+                    "interactions": {
+                        "content": {"type": "monster", "code": "x"},
+                        "transition": {
+                            "map_id": 1,
+                            "x": 1,
+                            "y": 1,
+                            "layer": "interior",
+                            "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                        },
+                    },
+                },
+                "path": [[1]],
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
     )
-    if not character:
-        error, character = artifacts_client.characters.create_character(
-            name="billy1",
-            skin=CharacterSkinEnum.MEN1,
-        )
-        if not character:
-            raise Exception(error)
+    message, data = client.actions.move(name="bob")
+    assert (message, data is not None) == (
+        "The character has moved successfully.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/move",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {}
 
-    return character.data.name
+
+def test_move_error(client, respond):
+    respond(404)
+    assert client.actions.move(name="bob") == ("Map not found.", None)
 
 
-# -------------------------------------------------
-# MOVE
-# -------------------------------------------------
-def test_action_move():
-    """Tests."""
-    error, result = artifacts_client.actions.move(
-        name=get_character_name(),
-        x=0,
-        y=1,
+def test_transition(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "destination": {
+                    "map_id": 1,
+                    "name": "x",
+                    "skin": "x",
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "access": {
+                        "type": "standard",
+                        "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                    },
+                    "interactions": {
+                        "content": {"type": "monster", "code": "x"},
+                        "transition": {
+                            "map_id": 1,
+                            "x": 1,
+                            "y": 1,
+                            "layer": "interior",
+                            "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                        },
+                    },
+                },
+                "transition": {
+                    "map_id": 1,
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.transition(name="bob")
+    assert (message, data is not None) == (
+        "The character has transitioned successfully.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/transition",
     )
 
-    if not result:
-        print(error)
 
-    else:
-        assert result
-        ic(result)
-        sleep(result.data.cooldown.total_seconds)
+def test_transition_error(client, respond):
+    respond(404)
+    assert client.actions.transition(name="bob") == ("Transition not found.", None)
 
 
-def test_action_move_back():
-    """Tests."""
-    error, result = artifacts_client.actions.move(
-        name=get_character_name(),
-        x=0,
-        y=0,
+def test_rest(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "hp_restored": 1,
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.rest(name="bob")
+    assert (message, data is not None) == (
+        "The character has rested successfully.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/rest",
     )
 
-    if not result:
-        print(error)
 
-    else:
-        assert result
-        ic(result)
-        sleep(result.data.cooldown.total_seconds)
-
-
-# -------------------------------------------------
-# REST
-# -------------------------------------------------
-def test_action_rest():
-    """Tests."""
-    error, result = artifacts_client.actions.rest(
-        name=get_character_name(),
+def test_rest_error(client, respond):
+    respond(486)
+    assert client.actions.rest(name="bob") == (
+        "An action is already in progress for this character.",
+        None,
     )
 
-    if not result:
-        print(error)
 
-    else:
-        assert result
-        ic(result)
-        sleep(result.data.cooldown.total_seconds)
+def test_equip_item(client, respond):
+    from artifactsmmo_sdk.models.actions import EquipSchema
 
-
-# -------------------------------------------------
-# UNEQUIP
-# -------------------------------------------------
-def test_unequip_item():
-    """Tests."""
-    error, result = artifacts_client.actions.unequip_item(
-        name=get_character_name(),
-        slot=SlotEnum.WEAPON,
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "items": [
+                    {
+                        "slot": "weapon",
+                        "item": {
+                            "name": "x",
+                            "code": "x",
+                            "level": 1,
+                            "type": "x",
+                            "subtype": "x",
+                            "description": "x",
+                            "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                            "effects": [{"code": "x", "value": 1, "description": "x"}],
+                            "craft": {
+                                "skill": "weaponcrafting",
+                                "level": 1,
+                                "items": [{"code": "x", "quantity": 1}],
+                                "quantity": 1,
+                            },
+                            "tradeable": True,
+                            "recyclable": True,
+                        },
+                    }
+                ],
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.equip_item(
+        name="bob",
+        items=[EquipSchema(**{"code": "x", "slot": "weapon", "quantity": 1})],
+    )
+    assert (message, data is not None) == (
+        "The item has been successfully equipped on your character.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/equip",
     )
 
-    if not result:
-        print(error)
 
-    else:
-        assert result
-        ic(result)
-        sleep(result.data.cooldown.total_seconds)
+def test_equip_item_error(client, respond):
+    from artifactsmmo_sdk.models.actions import EquipSchema
+
+    respond(404)
+    assert client.actions.equip_item(
+        name="bob",
+        items=[EquipSchema(**{"code": "x", "slot": "weapon", "quantity": 1})],
+    ) == ("Item not found.", None)
 
 
-# -------------------------------------------------
-# EQUIP
-# -------------------------------------------------
-def test_equip_item():
-    """Tests."""
-    error, result = artifacts_client.actions.equip_item(
-        name=get_character_name(),
-        code="wooden_stick",
-        slot=SlotEnum.WEAPON,
+def test_unequip_item(client, respond):
+    from artifactsmmo_sdk.models.actions import UnequipSchema
+
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "items": [
+                    {
+                        "slot": "weapon",
+                        "item": {
+                            "name": "x",
+                            "code": "x",
+                            "level": 1,
+                            "type": "x",
+                            "subtype": "x",
+                            "description": "x",
+                            "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                            "effects": [{"code": "x", "value": 1, "description": "x"}],
+                            "craft": {
+                                "skill": "weaponcrafting",
+                                "level": 1,
+                                "items": [{"code": "x", "quantity": 1}],
+                                "quantity": 1,
+                            },
+                            "tradeable": True,
+                            "recyclable": True,
+                        },
+                    }
+                ],
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.unequip_item(
+        name="bob", items=[UnequipSchema(**{"slot": "weapon", "quantity": 1})]
+    )
+    assert (message, data is not None) == (
+        "The item has been successfully unequipped and added in their inventory.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/unequip",
     )
 
-    if not result:
-        print(error)
 
-    else:
-        assert result
-        ic(result)
-        sleep(result.data.cooldown.total_seconds)
+def test_unequip_item_error(client, respond):
+    from artifactsmmo_sdk.models.actions import UnequipSchema
 
-
-# -------------------------------------------------
-# LOGS
-# -------------------------------------------------
-def test_get_all_character_logs():
-    """Tests."""
-    error, result = artifacts_client.actions.get_all_character_logs()
-
-    if not result:
-        print(error)
-
-    else:
-        assert result
-        ic(result)
-        sleep(1)
+    respond(404)
+    assert client.actions.unequip_item(
+        name="bob", items=[UnequipSchema(**{"slot": "weapon", "quantity": 1})]
+    ) == ("Item not found.", None)
 
 
-def test_gathering():
-    """Tests."""
-    error, result = artifacts_client.actions.gathering(name=get_character_name())
+def test_use_item(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "item": {
+                    "name": "x",
+                    "code": "x",
+                    "level": 1,
+                    "type": "x",
+                    "subtype": "x",
+                    "description": "x",
+                    "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                    "effects": [{"code": "x", "value": 1, "description": "x"}],
+                    "craft": {
+                        "skill": "weaponcrafting",
+                        "level": 1,
+                        "items": [{"code": "x", "quantity": 1}],
+                        "quantity": 1,
+                    },
+                    "tradeable": True,
+                    "recyclable": True,
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.use_item(name="bob", code="x", quantity=1)
+    assert (message, data is not None) == ("The item has been successfully used.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/use",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "code": "x",
+        "quantity": 1,
+    }
 
-    if not result:
-        print(error)
 
-    else:
-        assert result
-        ic(result)
-        sleep(result.data.cooldown.total_seconds)
+def test_use_item_error(client, respond):
+    respond(404)
+    assert client.actions.use_item(name="bob", code="x", quantity=1) == (
+        "Item not found.",
+        None,
+    )
+
+
+def test_fight(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "fight": {
+                    "result": "win",
+                    "turns": 1,
+                    "opponent": "x",
+                    "logs": ["x"],
+                    "characters": [
+                        {
+                            "character_name": "x",
+                            "xp": 1,
+                            "gold": 1,
+                            "drops": [{"code": "x", "quantity": 1}],
+                            "final_hp": 1,
+                        }
+                    ],
+                },
+                "characters": [
+                    {
+                        "name": "x",
+                        "account": "x",
+                        "skin": "x",
+                        "level": 1,
+                        "xp": 1,
+                        "max_xp": 1,
+                        "gold": 1,
+                        "speed": 1,
+                        "mining_level": 1,
+                        "mining_xp": 1,
+                        "mining_max_xp": 1,
+                        "woodcutting_level": 1,
+                        "woodcutting_xp": 1,
+                        "woodcutting_max_xp": 1,
+                        "fishing_level": 1,
+                        "fishing_xp": 1,
+                        "fishing_max_xp": 1,
+                        "weaponcrafting_level": 1,
+                        "weaponcrafting_xp": 1,
+                        "weaponcrafting_max_xp": 1,
+                        "gearcrafting_level": 1,
+                        "gearcrafting_xp": 1,
+                        "gearcrafting_max_xp": 1,
+                        "jewelrycrafting_level": 1,
+                        "jewelrycrafting_xp": 1,
+                        "jewelrycrafting_max_xp": 1,
+                        "cooking_level": 1,
+                        "cooking_xp": 1,
+                        "cooking_max_xp": 1,
+                        "alchemy_level": 1,
+                        "alchemy_xp": 1,
+                        "alchemy_max_xp": 1,
+                        "hp": 1,
+                        "max_hp": 1,
+                        "haste": 1,
+                        "critical_strike": 1,
+                        "wisdom": 1,
+                        "prospecting": 1,
+                        "initiative": 1,
+                        "threat": 1,
+                        "attack_fire": 1,
+                        "attack_earth": 1,
+                        "attack_water": 1,
+                        "attack_air": 1,
+                        "dmg": 1,
+                        "dmg_fire": 1,
+                        "dmg_earth": 1,
+                        "dmg_water": 1,
+                        "dmg_air": 1,
+                        "res_fire": 1,
+                        "res_earth": 1,
+                        "res_water": 1,
+                        "res_air": 1,
+                        "effects": [{"code": "x", "value": 1}],
+                        "x": 1,
+                        "y": 1,
+                        "layer": "interior",
+                        "map_id": 1,
+                        "cooldown": 1,
+                        "cooldown_expiration": "2024-01-01T00:00:00Z",
+                        "weapon_slot": "x",
+                        "rune_slot": "x",
+                        "shield_slot": "x",
+                        "helmet_slot": "x",
+                        "body_armor_slot": "x",
+                        "leg_armor_slot": "x",
+                        "boots_slot": "x",
+                        "ring1_slot": "x",
+                        "ring2_slot": "x",
+                        "amulet_slot": "x",
+                        "artifact1_slot": "x",
+                        "artifact2_slot": "x",
+                        "artifact3_slot": "x",
+                        "utility1_slot": "x",
+                        "utility1_slot_quantity": 1,
+                        "utility2_slot": "x",
+                        "utility2_slot_quantity": 1,
+                        "bag_slot": "x",
+                        "task": "x",
+                        "task_type": "x",
+                        "task_progress": 1,
+                        "task_total": 1,
+                        "inventory_max_items": 1,
+                        "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                    }
+                ],
+            }
+        },
+    )
+    message, data = client.actions.fight(name="bob")
+    assert (message, data is not None) == ("The fight ended successfully.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/fight",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {}
+
+
+def test_fight_error(client, respond):
+    respond(486)
+    assert client.actions.fight(name="bob") == (
+        "Only boss monsters can be fought by multiple characters.",
+        None,
+    )
+
+
+def test_gathering(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "details": {"xp": 1, "items": [{"code": "x", "quantity": 1}]},
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.gathering(name="bob")
+    assert (message, data is not None) == (
+        "The resource has been successfully gathered.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/gathering",
+    )
+
+
+def test_gathering_error(client, respond):
+    respond(486)
+    assert client.actions.gathering(name="bob") == (
+        "An action is already in progress for this character.",
+        None,
+    )
+
+
+def test_crafting(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "details": {"xp": 1, "items": [{"code": "x", "quantity": 1}]},
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.crafting(name="bob", code="x")
+    assert (message, data is not None) == ("The item was successfully crafted.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/crafting",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"code": "x"}
+
+
+def test_crafting_error(client, respond):
+    respond(404)
+    assert client.actions.crafting(name="bob", code="x") == ("Craft not found.", None)
+
+
+def test_deposit_bank_gold(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "bank": {"quantity": 1},
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.deposit_bank_gold(name="bob", quantity=1)
+    assert (message, data is not None) == (
+        "Golds successfully deposited in your bank.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/bank/deposit/gold",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"quantity": 1}
+
+
+def test_deposit_bank_gold_error(client, respond):
+    respond(461)
+    assert client.actions.deposit_bank_gold(name="bob", quantity=1) == (
+        "Some of your items or your gold in the bank are already part of an ongoing transaction.",
+        None,
+    )
+
+
+def test_deposit_bank(client, respond):
+    from artifactsmmo_sdk.models.common import SimpleItemSchema
+
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "items": [{"code": "x", "quantity": 1}],
+                "bank": [{"code": "x", "quantity": 1}],
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.deposit_bank(
+        name="bob", items=[SimpleItemSchema(**{"code": "x", "quantity": 1})]
+    )
+    assert (message, data is not None) == (
+        "Items successfully deposited in your bank.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/bank/deposit/item",
+    )
+
+
+def test_deposit_bank_error(client, respond):
+    from artifactsmmo_sdk.models.common import SimpleItemSchema
+
+    respond(404)
+    assert client.actions.deposit_bank(
+        name="bob", items=[SimpleItemSchema(**{"code": "x", "quantity": 1})]
+    ) == ("Item not found.", None)
+
+
+def test_withdraw_bank(client, respond):
+    from artifactsmmo_sdk.models.common import SimpleItemSchema
+
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "items": [{"code": "x", "quantity": 1}],
+                "bank": [{"code": "x", "quantity": 1}],
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.withdraw_bank(
+        name="bob", items=[SimpleItemSchema(**{"code": "x", "quantity": 1})]
+    )
+    assert (message, data is not None) == (
+        "Items successfully withdrawn from your bank.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/bank/withdraw/item",
+    )
+
+
+def test_withdraw_bank_error(client, respond):
+    from artifactsmmo_sdk.models.common import SimpleItemSchema
+
+    respond(404)
+    assert client.actions.withdraw_bank(
+        name="bob", items=[SimpleItemSchema(**{"code": "x", "quantity": 1})]
+    ) == ("Item not found.", None)
+
+
+def test_withdraw_bank_gold(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "bank": {"quantity": 1},
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.withdraw_bank_gold(name="bob", quantity=1)
+    assert (message, data is not None) == (
+        "Golds successfully withdraw from your bank.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/bank/withdraw/gold",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"quantity": 1}
+
+
+def test_withdraw_bank_gold_error(client, respond):
+    respond(460)
+    assert client.actions.withdraw_bank_gold(name="bob", quantity=1) == (
+        "Insufficient gold in your bank.",
+        None,
+    )
+
+
+def test_buy_bank_expansion(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "transaction": {"price": 1},
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.buy_bank_expansion(name="bob")
+    assert (message, data is not None) == ("Bank expansion successfully bought.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/bank/buy_expansion",
+    )
+
+
+def test_buy_bank_expansion_error(client, respond):
+    respond(486)
+    assert client.actions.buy_bank_expansion(name="bob") == (
+        "An action is already in progress for this character.",
+        None,
+    )
+
+
+def test_npc_buy_item(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "transaction": {
+                    "code": "x",
+                    "quantity": 1,
+                    "currency": "x",
+                    "price": 1,
+                    "total_price": 1,
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.npc_buy_item(name="bob", code="x", quantity=1)
+    assert (message, data is not None) == (
+        "Item successfully bought from the NPC.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/npc/buy",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "code": "x",
+        "quantity": 1,
+    }
+
+
+def test_npc_buy_item_error(client, respond):
+    respond(404)
+    assert client.actions.npc_buy_item(name="bob", code="x", quantity=1) == (
+        "Item not found.",
+        None,
+    )
+
+
+def test_npc_sell_item(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "transaction": {
+                    "code": "x",
+                    "quantity": 1,
+                    "currency": "x",
+                    "price": 1,
+                    "total_price": 1,
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.npc_sell_item(name="bob", code="x", quantity=1)
+    assert (message, data is not None) == ("Item successfully sold to the NPC.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/npc/sell",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "code": "x",
+        "quantity": 1,
+    }
+
+
+def test_npc_sell_item_error(client, respond):
+    respond(404)
+    assert client.actions.npc_sell_item(name="bob", code="x", quantity=1) == (
+        "Item not found.",
+        None,
+    )
+
+
+def test_recycling(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "details": {
+                    "items": [{"code": "x", "quantity": 1}],
+                    "enhanced": True,
+                    "gold": 1,
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.recycling(name="bob", code="x")
+    assert (message, data is not None) == (
+        "The items were successfully recycled.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/recycling",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"code": "x"}
+
+
+def test_recycling_error(client, respond):
+    respond(404)
+    assert client.actions.recycling(name="bob", code="x") == ("Item not found.", None)
+
+
+def test_ge_buy_item(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "order": {
+                    "id": "x",
+                    "code": "x",
+                    "quantity": 1,
+                    "price": 1,
+                    "total_price": 1,
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.ge_buy_item(name="bob", id="x", quantity=1)
+    assert (message, data is not None) == (
+        "Item successfully bought from the Grand Exchange.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/grandexchange/buy",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"id": "x", "quantity": 1}
+
+
+def test_ge_buy_item_error(client, respond):
+    respond(404)
+    assert client.actions.ge_buy_item(name="bob", id="x", quantity=1) == (
+        "Order not found.",
+        None,
+    )
+
+
+def test_ge_create_sell_order(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "order": {
+                    "id": "x",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "code": "x",
+                    "quantity": 1,
+                    "price": 1,
+                    "total_price": 1,
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.ge_create_sell_order(
+        name="bob", code="x", quantity=1, price=1
+    )
+    assert (message, data is not None) == (
+        "The sell order has been successfully created.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/grandexchange/create_sell_order",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "code": "x",
+        "quantity": 1,
+        "price": 1,
+    }
+
+
+def test_ge_create_sell_order_error(client, respond):
+    respond(404)
+    assert client.actions.ge_create_sell_order(
+        name="bob", code="x", quantity=1, price=1
+    ) == ("Item not found.", None)
+
+
+def test_ge_cancel_order(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "order": {
+                    "id": "x",
+                    "code": "x",
+                    "quantity": 1,
+                    "price": 1,
+                    "total_price": 1,
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.ge_cancel_order(name="bob", id="x")
+    assert (message, data is not None) == (
+        "Your order has been successfully cancelled.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/grandexchange/cancel",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"id": "x"}
+
+
+def test_ge_cancel_order_error(client, respond):
+    respond(404)
+    assert client.actions.ge_cancel_order(name="bob", id="x") == (
+        "Order not found.",
+        None,
+    )
+
+
+def test_ge_create_buy_order(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "order": {
+                    "id": "x",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "code": "x",
+                    "quantity": 1,
+                    "price": 1,
+                    "total_price": 1,
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.ge_create_buy_order(
+        name="bob", code="x", quantity=1, price=1
+    )
+    assert (message, data is not None) == (
+        "The buy order has been successfully created.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/grandexchange/create_buy_order",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "code": "x",
+        "quantity": 1,
+        "price": 1,
+    }
+
+
+def test_ge_create_buy_order_error(client, respond):
+    respond(404)
+    assert client.actions.ge_create_buy_order(
+        name="bob", code="x", quantity=1, price=1
+    ) == ("Item not found.", None)
+
+
+def test_ge_fill(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "order": {
+                    "id": "x",
+                    "code": "x",
+                    "quantity": 1,
+                    "price": 1,
+                    "total_price": 1,
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.ge_fill(name="bob", id="x", quantity=1)
+    assert (message, data is not None) == (
+        "Successfully sold items to the buy order.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/grandexchange/fill",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"id": "x", "quantity": 1}
+
+
+def test_ge_fill_error(client, respond):
+    respond(404)
+    assert client.actions.ge_fill(name="bob", id="x", quantity=1) == (
+        "Buy order not found.",
+        None,
+    )
+
+
+def test_complete_task(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "rewards": {"items": [{"code": "x", "quantity": 1}], "gold": 1},
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.complete_task(name="bob")
+    assert (message, data is not None) == (
+        "The task has been successfully completed.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/task/complete",
+    )
+
+
+def test_complete_task_error(client, respond):
+    respond(486)
+    assert client.actions.complete_task(name="bob") == (
+        "An action is already in progress for this character.",
+        None,
+    )
+
+
+def test_task_exchange(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "rewards": {"items": [{"code": "x", "quantity": 1}], "gold": 1},
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.task_exchange(name="bob")
+    assert (message, data is not None) == (
+        "The tasks coins have been successfully exchanged.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/task/exchange",
+    )
+
+
+def test_task_exchange_error(client, respond):
+    respond(478)
+    assert client.actions.task_exchange(name="bob") == (
+        "Missing required item(s).",
+        None,
+    )
+
+
+def test_accept_new_task(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "task": {
+                    "code": "x",
+                    "type": "monsters",
+                    "total": 1,
+                    "rewards": {"items": [{"code": "x", "quantity": 1}], "gold": 1},
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.accept_new_task(name="bob")
+    assert (message, data is not None) == ("New task successfully accepted.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/task/new",
+    )
+
+
+def test_accept_new_task_error(client, respond):
+    respond(486)
+    assert client.actions.accept_new_task(name="bob") == (
+        "An action is already in progress for this character.",
+        None,
+    )
+
+
+def test_task_trade(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "trade": {"code": "x", "quantity": 1},
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.task_trade(name="bob", code="x", quantity=1)
+    assert (message, data is not None) == (
+        "You have successfully trade items to a Tasks Master.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/task/trade",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "code": "x",
+        "quantity": 1,
+    }
+
+
+def test_task_trade_error(client, respond):
+    respond(474)
+    assert client.actions.task_trade(name="bob", code="x", quantity=1) == (
+        "The character does not have this task.",
+        None,
+    )
+
+
+def test_task_cancel(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.task_cancel(name="bob")
+    assert (message, data is not None) == (
+        "The task has been successfully cancelled.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/task/cancel",
+    )
+
+
+def test_task_cancel_error(client, respond):
+    respond(478)
+    assert client.actions.task_cancel(name="bob") == ("Missing required item(s).", None)
+
+
+def test_give_gold(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "quantity": 1,
+                "receiver_character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.give_gold(name="bob", quantity=1, character="x")
+    assert (message, data is not None) == ("Gold given successfully.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/give/gold",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "quantity": 1,
+        "character": "x",
+    }
+
+
+def test_give_gold_error(client, respond):
+    respond(486)
+    assert client.actions.give_gold(name="bob", quantity=1, character="x") == (
+        "An action is already in progress for this character.",
+        None,
+    )
+
+
+def test_give_items(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "items": [{"code": "x", "quantity": 1}],
+                "receiver_character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.give_items(
+        name="bob", items=[{"code": "x", "quantity": 1}], character="x"
+    )
+    assert (message, data is not None) == ("Items given successfully.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/give/item",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "items": [{"code": "x", "quantity": 1}],
+        "character": "x",
+    }
+
+
+def test_give_items_error(client, respond):
+    respond(404)
+    assert client.actions.give_items(
+        name="bob", items=[{"code": "x", "quantity": 1}], character="x"
+    ) == ("Item not found.", None)
+
+
+def test_claim_pending_item(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "item": {
+                    "id": "x",
+                    "account": "x",
+                    "source": "achievement",
+                    "source_id": "x",
+                    "description": "x",
+                    "gold": 1,
+                    "items": [{"code": "x", "quantity": 1}],
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "claimed_at": "2024-01-01T00:00:00Z",
+                },
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.claim_pending_item(name="bob", id="x")
+    assert (message, data is not None) == (
+        "Successfully claimed the pending item.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/claim_item/x",
+    )
+
+
+def test_claim_pending_item_error(client, respond):
+    respond(404)
+    assert client.actions.claim_pending_item(name="bob", id="x") == (
+        "Pending item not found.",
+        None,
+    )
+
+
+def test_delete_item(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "item": {"code": "x", "quantity": 1},
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.delete_item(name="bob", code="x", quantity=1)
+    assert (message, data is not None) == (
+        "Item successfully deleted from your character.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/delete",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "code": "x",
+        "quantity": 1,
+    }
+
+
+def test_delete_item_error(client, respond):
+    respond(478)
+    assert client.actions.delete_item(name="bob", code="x", quantity=1) == (
+        "Missing required item(s).",
+        None,
+    )
+
+
+def test_change_skin(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "skin": "x",
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.change_skin(name="bob", skin="x")
+    assert (message, data is not None) == ("Skin successfully changed.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/change_skin",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"skin": "x"}
+
+
+def test_change_skin_error(client, respond):
+    respond(404)
+    assert client.actions.change_skin(name="bob", skin="x") == ("Skin not found.", None)
+
+
+def test_rename(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "old_name": "x",
+                "new_name": "x",
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.rename(name="bob", new_name="x")
+    assert (message, data is not None) == ("Character successfully renamed.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/rename",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"name": "x"}
+
+
+def test_rename_error(client, respond):
+    respond(404)
+    assert client.actions.rename(name="bob", new_name="x") == (
+        "Character not found.",
+        None,
+    )
+
+
+def test_get_all_character_logs(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "character": "x",
+                    "account": "x",
+                    "type": "spawn",
+                    "description": "x",
+                    "content": None,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                }
+            ],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.actions.get_all_character_logs()
+    assert (message, data is not None) == ("Successfully fetched logs.", True)
+    assert client.session.request.call_args.args == ("GET", "http://api.test/my/logs")
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
+
+
+def test_get_all_character_logs_error(client, respond):
+    respond(404)
+    assert client.actions.get_all_character_logs() == ("Logs not found.", None)
+
+
+def test_get_character_logs(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "character": "x",
+                    "account": "x",
+                    "type": "spawn",
+                    "description": "x",
+                    "content": None,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                }
+            ],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.actions.get_character_logs(name="bob")
+    assert (message, data is not None) == ("Successfully fetched logs.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/logs/bob",
+    )
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
+
+
+def test_get_character_logs_error(client, respond):
+    respond(404)
+    assert client.actions.get_character_logs(name="bob") == ("Logs not found.", None)
+
+
+def test_get_my_characters(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                }
+            ]
+        },
+    )
+    message, data = client.actions.get_my_characters()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/characters",
+    )

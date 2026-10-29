@@ -1,0 +1,118 @@
+"""Characters."""
+
+from typing import Annotated
+
+from pydantic import Field
+
+from ..base import BaseModule
+from ..models.characters import (
+    ActiveCharacterSchemaPage,
+    CharacterResponseSchema,
+    CharacterStatsResponseSchema,
+)
+
+
+class Characters(BaseModule):
+    """Characters."""
+
+    def create_character(
+        self,
+        name: Annotated[
+            str,
+            Field(
+                description="Your desired character name. It's unique and all players can see it.",
+                pattern="^[a-zA-Z0-9_-]+$",
+            ),
+        ],
+        skin: Annotated[str, Field(description="Your desired skin.")],
+    ) -> tuple[str, CharacterResponseSchema | None]:
+        """Create new character on your account. You can create up to 5 characters."""
+        return self._request(
+            "POST",
+            "/characters/create",
+            CharacterResponseSchema,
+            "Successfully created character.",
+            {
+                404: "Skin not found.",
+                494: "This name is already in use.",
+                495: "You have reached the maximum number of characters on your account.",
+                550: "You cannot choose this skin because you do not own it.",
+            },
+            json={
+                "name": name,
+                "skin": skin,
+            },
+        )
+
+    def delete_character(
+        self,
+        name: Annotated[
+            str, Field(description="Character name.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+    ) -> tuple[str, CharacterResponseSchema | None]:
+        """Delete character on your account."""
+        return self._request(
+            "POST",
+            "/characters/delete",
+            CharacterResponseSchema,
+            "Successfully deleted character.",
+            json={
+                "name": name,
+            },
+        )
+
+    def get_character_stats(
+        self,
+        name: Annotated[
+            str,
+            Field(description="The name of the character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, CharacterStatsResponseSchema | None]:
+        """Retrieve gameplay statistics for a character.
+
+        Stats are only visible if the character's account has an active subscription.
+        Statistics are still collected for all accounts regardless of subscription status."""
+        return self._request(
+            "GET",
+            f"/characters/{name}/stats",
+            CharacterStatsResponseSchema,
+            "Successfully fetched character stats.",
+            {
+                404: "character stats not found.",
+            },
+        )
+
+    def get_active_characters(
+        self,
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=100)] = 50,
+    ) -> tuple[str, ActiveCharacterSchemaPage | None]:
+        """Fetch active characters details."""
+        return self._request(
+            "GET",
+            "/characters/active",
+            ActiveCharacterSchemaPage,
+            "Successfully fetched active characters.",
+            params={
+                "page": page,
+                "size": size,
+            },
+        )
+
+    def get_character(
+        self,
+        name: Annotated[
+            str,
+            Field(description="The name of the character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, CharacterResponseSchema | None]:
+        """Retrieve the details of a character."""
+        return self._request(
+            "GET",
+            f"/characters/{name}",
+            CharacterResponseSchema,
+            "Successfully fetched character.",
+            {
+                404: "character not found.",
+            },
+        )
