@@ -531,3 +531,31 @@ class Actions(BaseModule):
                 "price": price,
             },
         )
+
+    def ge_cancel_order(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        id: Annotated[str, Field(description="Order id.")],
+    ) -> tuple[str, GETransactionResponseSchema | None]:
+        """Cancel an order (sell or buy) at the Grand Exchange on the character's map.
+
+        For sell orders: Items are returned to your inventory.
+        For buy orders: Gold is refunded to your character."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/grandexchange/cancel",
+            GETransactionResponseSchema,
+            "Your order has been successfully cancelled.",
+            {
+                404: "Order not found.",
+                436: "A transaction is already in progress for this order by another character.",
+                438: "You cannot cancel an order that is not yours.",
+                598: "Grand Exchange not found on this map.",
+            },
+            json={
+                "id": id,
+            },
+        )
