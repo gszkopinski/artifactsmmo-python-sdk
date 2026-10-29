@@ -287,6 +287,28 @@ class NpcMerchantTransactionResponseSchema(BaseModel):
     data: NpcMerchantTransactionSchema
 
 
+class RecyclingItemsSchema(BaseModel):
+    """RecyclingItemsSchema"""
+
+    items: list[DropSchema]
+    enhanced: bool | None = None
+    gold: int | None = None
+
+
+class RecyclingDataSchema(BaseModel):
+    """RecyclingDataSchema"""
+
+    cooldown: CooldownSchema
+    details: RecyclingItemsSchema
+    character: CharacterSchema
+
+
+class RecyclingResponseSchema(BaseModel):
+    """RecyclingResponseSchema"""
+
+    data: RecyclingDataSchema
+
+
 class SkillInfoSchema(BaseModel):
     """SkillInfoSchema"""
 

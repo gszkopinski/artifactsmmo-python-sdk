@@ -16,6 +16,7 @@ from ..models.actions import (
     EquipmentResponseSchema,
     EquipSchema,
     NpcMerchantTransactionResponseSchema,
+    RecyclingResponseSchema,
     SkillResponseSchema,
     UnequipSchema,
     UseItemResponseSchema,
@@ -428,5 +429,41 @@ class Actions(BaseModule):
             json={
                 "code": code,
                 "quantity": quantity,
+            },
+        )
+
+    def recycling(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        code: Annotated[
+            str, Field(description="Item code.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+        quantity: Annotated[
+            int | None, Field(description="Quantity of items to recycle.", ge=1)
+        ] = None,
+        enhanced: Annotated[
+            bool | None, Field(description="Whether to use enhanced recycling.")
+        ] = None,
+    ) -> tuple[str, RecyclingResponseSchema | None]:
+        """Recycling an item. The character must be on a map with a workshop (only for equipments and weapons)."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/recycling",
+            RecyclingResponseSchema,
+            "The items were successfully recycled.",
+            {
+                404: "Item not found.",
+                473: "This item cannot be recycled.",
+                492: "The character does not have enough gold.",
+                493: "The character's skill level is too low.",
+                598: "Workshop not found on this map.",
+            },
+            json={
+                "code": code,
+                "quantity": quantity,
+                "enhanced": enhanced,
             },
         )
