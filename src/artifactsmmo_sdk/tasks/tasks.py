@@ -9,6 +9,7 @@ from ..models.common import (
     TaskType,
 )
 from ..models.tasks import (
+    RewardResponseSchema,
     Skill,
     StaticDataPage_DropRateSchema_,
     StaticDataPage_TaskFullSchema_,
@@ -79,5 +80,25 @@ class Tasks(BaseModule):
             params={
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_tasks_reward(
+        self,
+        code: Annotated[
+            str,
+            Field(
+                description="The code of the tasks reward.", pattern="^[a-zA-Z0-9_-]+$"
+            ),
+        ],
+    ) -> tuple[str, RewardResponseSchema | None]:
+        """Retrieve the details of a tasks reward."""
+        return self._request(
+            "GET",
+            f"/tasks/rewards/{code}",
+            RewardResponseSchema,
+            "Successfully fetched tasks reward.",
+            {
+                404: "tasks reward not found.",
             },
         )

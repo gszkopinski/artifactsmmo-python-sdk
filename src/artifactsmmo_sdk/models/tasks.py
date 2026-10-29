@@ -7,6 +7,12 @@ from pydantic import BaseModel
 from .common import DropRateSchema, RewardsSchema, TaskType
 
 
+class RewardResponseSchema(BaseModel):
+    """RewardResponseSchema"""
+
+    data: DropRateSchema
+
+
 class Skill(str, Enum):
     """Skill."""
 
