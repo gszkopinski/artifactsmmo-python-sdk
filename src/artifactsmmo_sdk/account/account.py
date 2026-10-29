@@ -7,7 +7,7 @@ from pydantic import Field
 from ..base import BaseModule
 from ..models.account import (
     BankResponseSchema,
-    DataPage_SimpleItemSchema_,
+    SimpleItemSchemaPage,
 )
 
 
@@ -33,14 +33,14 @@ class Account(BaseModule):
                 description="Item to search in your bank.", pattern="^[a-zA-Z0-9_-]+$"
             ),
         ] = None,
-        page: Annotated[int | None, Field(description="Page number", ge=1)] = 1,
-        size: Annotated[int | None, Field(description="Page size", ge=1, le=100)] = 50,
-    ) -> tuple[str, DataPage_SimpleItemSchema_ | None]:
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=100)] = 50,
+    ) -> tuple[str, SimpleItemSchemaPage | None]:
         """Fetch all items in your bank."""
         return self._request(
             "GET",
             "/my/bank/items",
-            DataPage_SimpleItemSchema_,
+            SimpleItemSchemaPage,
             "Successfully fetched data.",
             params={
                 "item_code": item_code,

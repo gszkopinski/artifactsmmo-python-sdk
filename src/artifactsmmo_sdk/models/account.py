@@ -20,7 +20,7 @@ class BankResponseSchema(BaseModel):
     data: BankSchema
 
 
-class DataPage_SimpleItemSchema_(BaseModel):
+class SimpleItemSchemaPage(BaseModel):
     """DataPage[SimpleItemSchema]"""
 
     data: list[SimpleItemSchema]
