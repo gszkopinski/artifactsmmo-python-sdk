@@ -7,6 +7,7 @@ from pydantic import Field
 from ..base import BaseModule
 from ..models.accounts import (
     AccountAchievementSchemaPage,
+    CharactersListSchema,
 )
 from ..models.common import (
     AchievementType,
@@ -46,4 +47,19 @@ class Accounts(BaseModule):
                 "page": page,
                 "size": size,
             },
+        )
+
+    def get_account_characters(
+        self,
+        account: Annotated[
+            str,
+            Field(description="The name of the account.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, CharactersListSchema | None]:
+        """Account character lists."""
+        return self._request(
+            "GET",
+            f"/accounts/{account}/characters",
+            CharactersListSchema,
+            "Successfully fetched account characters.",
         )

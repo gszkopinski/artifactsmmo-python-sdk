@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from .common import AchievementRewardsSchema, AchievementType
+from .common import AchievementRewardsSchema, AchievementType, CharacterSchema
 
 
 class AccountAchievementObjectiveSchema(BaseModel):
@@ -26,6 +26,12 @@ class AccountAchievementSchema(BaseModel):
     objectives: list[AccountAchievementObjectiveSchema]
     rewards: AchievementRewardsSchema
     completed_at: datetime | None = None
+
+
+class CharactersListSchema(BaseModel):
+    """CharactersListSchema"""
+
+    data: list[CharacterSchema]
 
 
 class AccountAchievementSchemaPage(BaseModel):
