@@ -11,6 +11,7 @@ from ..models.actions import (
     CharacterTransitionResponseSchema,
     EquipmentResponseSchema,
     EquipSchema,
+    UnequipSchema,
 )
 
 
@@ -114,6 +115,31 @@ class Actions(BaseModule):
                 485: "This item is already equipped.",
                 491: "The equipment slot is not empty.",
                 496: "Conditions not met.",
+            },
+            json=[item.model_dump(mode="json", exclude_none=True) for item in items],
+        )
+
+    def unequip_item(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        items: Annotated[
+            list[UnequipSchema], Field(description="List of items to unequip.")
+        ],
+    ) -> tuple[str, EquipmentResponseSchema | None]:
+        """Unequip multiple items on your character.
+        The cooldown will be 3 seconds multiplied by the number of different items unequipped."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/unequip",
+            EquipmentResponseSchema,
+            "The item has been successfully unequipped and added in their inventory.",
+            {
+                404: "Item not found.",
+                483: "The character does not have enough HP to unequip this item.",
+                491: "The equipment slot is empty.",
             },
             json=[item.model_dump(mode="json", exclude_none=True) for item in items],
         )

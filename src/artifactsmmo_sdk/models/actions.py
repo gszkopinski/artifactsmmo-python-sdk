@@ -152,3 +152,10 @@ class EquipmentResponseSchema(BaseModel):
     """EquipmentResponseSchema"""
 
     data: EquipmentTransactionSchema
+
+
+class UnequipSchema(BaseModel):
+    """UnequipSchema"""
+
+    slot: ItemSlot
+    quantity: int | None = None

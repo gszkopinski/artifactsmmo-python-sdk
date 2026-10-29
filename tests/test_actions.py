@@ -557,3 +557,151 @@ def test_equip_item_error(client, respond):
         name="bob",
         items=[EquipSchema(**{"code": "x", "slot": "weapon", "quantity": 1})],
     ) == ("Item not found.", None)
+
+
+def test_unequip_item(client, respond):
+    from artifactsmmo_sdk.models.actions import UnequipSchema
+
+    respond(
+        200,
+        {
+            "data": {
+                "cooldown": {
+                    "total_seconds": 1,
+                    "remaining_seconds": 1,
+                    "started_at": "2024-01-01T00:00:00Z",
+                    "expiration": "2024-01-01T00:00:00Z",
+                    "reason": "movement",
+                },
+                "items": [
+                    {
+                        "slot": "weapon",
+                        "item": {
+                            "name": "x",
+                            "code": "x",
+                            "level": 1,
+                            "type": "x",
+                            "subtype": "x",
+                            "description": "x",
+                            "conditions": [{"code": "x", "operator": "eq", "value": 1}],
+                            "effects": [{"code": "x", "value": 1, "description": "x"}],
+                            "craft": {
+                                "skill": "weaponcrafting",
+                                "level": 1,
+                                "items": [{"code": "x", "quantity": 1}],
+                                "quantity": 1,
+                            },
+                            "tradeable": True,
+                            "recyclable": True,
+                        },
+                    }
+                ],
+                "character": {
+                    "name": "x",
+                    "account": "x",
+                    "skin": "x",
+                    "level": 1,
+                    "xp": 1,
+                    "max_xp": 1,
+                    "gold": 1,
+                    "speed": 1,
+                    "mining_level": 1,
+                    "mining_xp": 1,
+                    "mining_max_xp": 1,
+                    "woodcutting_level": 1,
+                    "woodcutting_xp": 1,
+                    "woodcutting_max_xp": 1,
+                    "fishing_level": 1,
+                    "fishing_xp": 1,
+                    "fishing_max_xp": 1,
+                    "weaponcrafting_level": 1,
+                    "weaponcrafting_xp": 1,
+                    "weaponcrafting_max_xp": 1,
+                    "gearcrafting_level": 1,
+                    "gearcrafting_xp": 1,
+                    "gearcrafting_max_xp": 1,
+                    "jewelrycrafting_level": 1,
+                    "jewelrycrafting_xp": 1,
+                    "jewelrycrafting_max_xp": 1,
+                    "cooking_level": 1,
+                    "cooking_xp": 1,
+                    "cooking_max_xp": 1,
+                    "alchemy_level": 1,
+                    "alchemy_xp": 1,
+                    "alchemy_max_xp": 1,
+                    "hp": 1,
+                    "max_hp": 1,
+                    "haste": 1,
+                    "critical_strike": 1,
+                    "wisdom": 1,
+                    "prospecting": 1,
+                    "initiative": 1,
+                    "threat": 1,
+                    "attack_fire": 1,
+                    "attack_earth": 1,
+                    "attack_water": 1,
+                    "attack_air": 1,
+                    "dmg": 1,
+                    "dmg_fire": 1,
+                    "dmg_earth": 1,
+                    "dmg_water": 1,
+                    "dmg_air": 1,
+                    "res_fire": 1,
+                    "res_earth": 1,
+                    "res_water": 1,
+                    "res_air": 1,
+                    "effects": [{"code": "x", "value": 1}],
+                    "x": 1,
+                    "y": 1,
+                    "layer": "interior",
+                    "map_id": 1,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "weapon_slot": "x",
+                    "rune_slot": "x",
+                    "shield_slot": "x",
+                    "helmet_slot": "x",
+                    "body_armor_slot": "x",
+                    "leg_armor_slot": "x",
+                    "boots_slot": "x",
+                    "ring1_slot": "x",
+                    "ring2_slot": "x",
+                    "amulet_slot": "x",
+                    "artifact1_slot": "x",
+                    "artifact2_slot": "x",
+                    "artifact3_slot": "x",
+                    "utility1_slot": "x",
+                    "utility1_slot_quantity": 1,
+                    "utility2_slot": "x",
+                    "utility2_slot_quantity": 1,
+                    "bag_slot": "x",
+                    "task": "x",
+                    "task_type": "x",
+                    "task_progress": 1,
+                    "task_total": 1,
+                    "inventory_max_items": 1,
+                    "inventory": [{"slot": 1, "code": "x", "quantity": 1}],
+                },
+            }
+        },
+    )
+    message, data = client.actions.unequip_item(
+        name="bob", items=[UnequipSchema(**{"slot": "weapon", "quantity": 1})]
+    )
+    assert (message, data is not None) == (
+        "The item has been successfully unequipped and added in their inventory.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/bob/action/unequip",
+    )
+
+
+def test_unequip_item_error(client, respond):
+    from artifactsmmo_sdk.models.actions import UnequipSchema
+
+    respond(404)
+    assert client.actions.unequip_item(
+        name="bob", items=[UnequipSchema(**{"slot": "weapon", "quantity": 1})]
+    ) == ("Item not found.", None)
