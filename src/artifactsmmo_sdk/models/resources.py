@@ -26,6 +26,12 @@ class ResourceSchema(BaseModel):
     drops: list[DropRateSchema]
 
 
+class ResourceResponseSchema(BaseModel):
+    """ResourceResponseSchema"""
+
+    data: ResourceSchema
+
+
 class StaticDataPage_ResourceSchema_(BaseModel):
     """StaticDataPage[ResourceSchema]"""
 

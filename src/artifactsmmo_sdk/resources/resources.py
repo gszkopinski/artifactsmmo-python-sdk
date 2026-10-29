@@ -7,6 +7,7 @@ from pydantic import Field
 from ..base import BaseModule
 from ..models.resources import (
     GatheringSkill,
+    ResourceResponseSchema,
     StaticDataPage_ResourceSchema_,
 )
 
@@ -45,5 +46,23 @@ class Resources(BaseModule):
                 "drop": drop,
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_resource(
+        self,
+        code: Annotated[
+            str,
+            Field(description="The code of the resource.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, ResourceResponseSchema | None]:
+        """Retrieve the details of a resource."""
+        return self._request(
+            "GET",
+            f"/resources/{code}",
+            ResourceResponseSchema,
+            "Successfully fetched resource.",
+            {
+                404: "resource not found.",
             },
         )
