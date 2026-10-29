@@ -1,5 +1,6 @@
 """GemsShop schemas."""
 
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel
@@ -80,3 +81,18 @@ class GemShopCatalogResponseSchema(BaseModel):
     """GemShopCatalogResponseSchema"""
 
     data: GemShopCatalogDataSchema
+
+
+class GemShopSubscriptionResponseDataSchema(BaseModel):
+    """GemShopSubscriptionResponseDataSchema"""
+
+    member: bool
+    member_expiration: datetime
+    gems: int
+    cost: int
+
+
+class GemShopSubscriptionResponseSchema(BaseModel):
+    """GemShopSubscriptionResponseSchema"""
+
+    data: GemShopSubscriptionResponseDataSchema

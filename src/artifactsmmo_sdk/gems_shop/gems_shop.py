@@ -9,6 +9,7 @@ from ..models.gems_shop import (
     ActiveEventResponseSchema,
     BuySkinResponseSchema,
     GemShopCatalogResponseSchema,
+    GemShopSubscriptionResponseSchema,
 )
 
 
@@ -66,5 +67,20 @@ class GemsShop(BaseModule):
             },
             json={
                 "code": code,
+            },
+        )
+
+    def buy_subscription(
+        self,
+    ) -> tuple[str, GemShopSubscriptionResponseSchema | None]:
+        """Buy or extend membership by 30 days using gems. Unavailable while a Stripe subscription is active."""
+        return self._request(
+            "POST",
+            "/gems_shop/subscription",
+            GemShopSubscriptionResponseSchema,
+            "Successfully fetched data.",
+            {
+                563: "Insufficient gems.",
+                573: "An active Stripe subscription cannot be extended with gems or member tokens.",
             },
         )
