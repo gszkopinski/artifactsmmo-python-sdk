@@ -10,6 +10,7 @@ from ..models.account import (
     SimpleItemSchemaPage,
 )
 from ..models.common import (
+    GEOrderHistorySchemaPage,
     GEOrderSchemaPage,
     GEOrderType,
 )
@@ -74,6 +75,39 @@ class Account(BaseModule):
             params={
                 "code": code,
                 "type": type,
+                "page": page,
+                "size": size,
+            },
+        )
+
+    def get_ge_sell_history(
+        self,
+        id: Annotated[
+            str | None,
+            Field(
+                description="Order ID to search in your history.",
+                pattern="^[a-zA-Z0-9_-]+$",
+            ),
+        ] = None,
+        code: Annotated[
+            str | None,
+            Field(
+                description="Item to search in your history.",
+                pattern="^[a-zA-Z0-9_-]+$",
+            ),
+        ] = None,
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=100)] = 50,
+    ) -> tuple[str, GEOrderHistorySchemaPage | None]:
+        """Fetch your transaction history of the last 7 days (buy and sell orders)."""
+        return self._request(
+            "GET",
+            "/my/grandexchange/history",
+            GEOrderHistorySchemaPage,
+            "Successfully fetched data.",
+            params={
+                "id": id,
+                "code": code,
                 "page": page,
                 "size": size,
             },

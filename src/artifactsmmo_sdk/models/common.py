@@ -6,6 +6,28 @@ from enum import Enum
 from pydantic import BaseModel
 
 
+class GEOrderHistorySchema(BaseModel):
+    """GEOrderHistorySchema"""
+
+    order_id: str
+    seller: str
+    buyer: str
+    code: str
+    quantity: int
+    price: int
+    sold_at: datetime
+
+
+class GEOrderHistorySchemaPage(BaseModel):
+    """DataPage[GEOrderHistorySchema]"""
+
+    data: list[GEOrderHistorySchema]
+    total: int
+    page: int
+    size: int
+    pages: int
+
+
 class GEOrderType(str, Enum):
     """GEOrderType."""
 
