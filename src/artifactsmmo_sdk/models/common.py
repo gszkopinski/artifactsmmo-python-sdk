@@ -194,6 +194,34 @@ class CharacterSchema(BaseModel):
     inventory: list[InventorySlotSchema] | None = None
 
 
+class CraftSkill(str, Enum):
+    """CraftSkill."""
+
+    WEAPONCRAFTING = "weaponcrafting"
+    GEARCRAFTING = "gearcrafting"
+    JEWELRYCRAFTING = "jewelrycrafting"
+    COOKING = "cooking"
+    WOODCUTTING = "woodcutting"
+    MINING = "mining"
+    ALCHEMY = "alchemy"
+
+
+class SimpleItemSchema(BaseModel):
+    """SimpleItemSchema"""
+
+    code: str
+    quantity: int
+
+
+class CraftSchema(BaseModel):
+    """CraftSchema"""
+
+    skill: CraftSkill | None = None
+    level: int | None = None
+    items: list[SimpleItemSchema] | None = None
+    quantity: int | None = None
+
+
 class GEOrderHistorySchema(BaseModel):
     """GEOrderHistorySchema"""
 
@@ -282,6 +310,30 @@ class InteractionSchema(BaseModel):
     transition: TransitionSchema | None = None
 
 
+class SimpleEffectSchema(BaseModel):
+    """SimpleEffectSchema"""
+
+    code: str
+    value: int
+    description: str
+
+
+class ItemSchema(BaseModel):
+    """ItemSchema"""
+
+    name: str
+    code: str
+    level: int
+    type: str
+    subtype: str
+    description: str
+    conditions: list[ConditionSchema] | None = None
+    effects: list[SimpleEffectSchema] | None = None
+    craft: CraftSchema | None = None
+    tradeable: bool
+    recyclable: bool | None = None
+
+
 class MapSchema(BaseModel):
     """MapSchema"""
 
@@ -304,13 +356,6 @@ class PendingItemSource(str, Enum):
     EVENT = "event"
     RAID = "raid"
     OTHER = "other"
-
-
-class SimpleItemSchema(BaseModel):
-    """SimpleItemSchema"""
-
-    code: str
-    quantity: int
 
 
 class PendingItemSchema(BaseModel):

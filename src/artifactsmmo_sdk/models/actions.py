@@ -5,7 +5,7 @@ from enum import Enum
 
 from pydantic import BaseModel
 
-from .common import CharacterSchema, MapSchema, TransitionSchema
+from .common import CharacterSchema, ItemSchema, MapSchema, TransitionSchema
 
 
 class ActionType(str, Enum):
@@ -102,3 +102,53 @@ class CharacterTransitionResponseSchema(BaseModel):
     """CharacterTransitionResponseSchema"""
 
     data: CharacterTransitionDataSchema
+
+
+class ItemSlot(str, Enum):
+    """ItemSlot."""
+
+    WEAPON = "weapon"
+    SHIELD = "shield"
+    HELMET = "helmet"
+    BODY_ARMOR = "body_armor"
+    LEG_ARMOR = "leg_armor"
+    BOOTS = "boots"
+    RING1 = "ring1"
+    RING2 = "ring2"
+    AMULET = "amulet"
+    ARTIFACT1 = "artifact1"
+    ARTIFACT2 = "artifact2"
+    ARTIFACT3 = "artifact3"
+    UTILITY1 = "utility1"
+    UTILITY2 = "utility2"
+    BAG = "bag"
+    RUNE = "rune"
+
+
+class EquipSchema(BaseModel):
+    """EquipSchema"""
+
+    code: str
+    slot: ItemSlot
+    quantity: int | None = None
+
+
+class EquipmentItemSchema(BaseModel):
+    """EquipmentItemSchema"""
+
+    slot: ItemSlot
+    item: ItemSchema
+
+
+class EquipmentTransactionSchema(BaseModel):
+    """EquipmentTransactionSchema"""
+
+    cooldown: CooldownSchema
+    items: list[EquipmentItemSchema]
+    character: CharacterSchema
+
+
+class EquipmentResponseSchema(BaseModel):
+    """EquipmentResponseSchema"""
+
+    data: EquipmentTransactionSchema

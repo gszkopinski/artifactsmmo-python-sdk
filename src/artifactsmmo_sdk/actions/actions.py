@@ -9,6 +9,8 @@ from ..models.actions import (
     CharacterMovementResponseSchema,
     CharacterRestResponseSchema,
     CharacterTransitionResponseSchema,
+    EquipmentResponseSchema,
+    EquipSchema,
 )
 
 
@@ -86,4 +88,32 @@ class Actions(BaseModule):
             f"/my/{name}/action/rest",
             CharacterRestResponseSchema,
             "The character has rested successfully.",
+        )
+
+    def equip_item(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        items: Annotated[
+            list[EquipSchema], Field(description="List of items to equip.")
+        ],
+    ) -> tuple[str, EquipmentResponseSchema | None]:
+        """Equip multiple items on your character.
+        The cooldown will be 3 seconds multiplied by the number of different items equipped."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/equip",
+            EquipmentResponseSchema,
+            "The item has been successfully equipped on your character.",
+            {
+                404: "Item not found.",
+                483: "The character does not have enough HP to unequip this item.",
+                484: "The character cannot equip more than 100 utilities in the same slot.",
+                485: "This item is already equipped.",
+                491: "The equipment slot is not empty.",
+                496: "Conditions not met.",
+            },
+            json=[item.model_dump(mode="json", exclude_none=True) for item in items],
         )
