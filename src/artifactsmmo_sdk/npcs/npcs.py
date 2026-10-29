@@ -8,6 +8,7 @@ from ..base import BaseModule
 from ..models.npcs import (
     NPCResponseSchema,
     NPCType,
+    StaticDataPage_NPCItemSchema_,
     StaticDataPage_NPCSchema_,
 )
 
@@ -72,5 +73,28 @@ class Npcs(BaseModule):
             "Successfully fetched NPC.",
             {
                 404: "NPC not found.",
+            },
+        )
+
+    def get_npc_items(
+        self,
+        code: Annotated[
+            str, Field(description="The code of the NPC.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=10000)] = 50,
+    ) -> tuple[str, StaticDataPage_NPCItemSchema_ | None]:
+        """Retrieve the items list of a NPC. If the NPC has items to buy, sell or trade, they will be displayed."""
+        return self._request(
+            "GET",
+            f"/npcs/items/{code}",
+            StaticDataPage_NPCItemSchema_,
+            "Successfully fetched NPC items.",
+            {
+                404: "NPC items not found.",
+            },
+            params={
+                "page": page,
+                "size": size,
             },
         )
