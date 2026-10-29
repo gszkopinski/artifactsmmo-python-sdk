@@ -40,6 +40,12 @@ class MonsterSchema(BaseModel):
     drops: list[DropRateSchema]
 
 
+class MonsterResponseSchema(BaseModel):
+    """MonsterResponseSchema"""
+
+    data: MonsterSchema
+
+
 class StaticDataPage_MonsterSchema_(BaseModel):
     """StaticDataPage[MonsterSchema]"""
 

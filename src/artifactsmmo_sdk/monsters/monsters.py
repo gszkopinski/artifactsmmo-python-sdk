@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.monsters import (
+    MonsterResponseSchema,
     StaticDataPage_MonsterSchema_,
 )
 
@@ -48,5 +49,23 @@ class Monsters(BaseModule):
                 "drop": drop,
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_monster(
+        self,
+        code: Annotated[
+            str,
+            Field(description="The code of the monster.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, MonsterResponseSchema | None]:
+        """Retrieve the details of a monster."""
+        return self._request(
+            "GET",
+            f"/monsters/{code}",
+            MonsterResponseSchema,
+            "Successfully fetched monster.",
+            {
+                404: "monster not found.",
             },
         )
