@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.actions import (
+    CharacterFightResponseSchema,
     CharacterMovementResponseSchema,
     CharacterRestResponseSchema,
     CharacterTransitionResponseSchema,
@@ -170,5 +171,35 @@ class Actions(BaseModule):
             json={
                 "code": code,
                 "quantity": quantity,
+            },
+        )
+
+    def fight(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        participants: Annotated[
+            list[str] | None,
+            Field(
+                description="Optional list of additional character names to include in the fight (max 2 additional characters)."
+            ),
+        ] = None,
+    ) -> tuple[str, CharacterFightResponseSchema | None]:
+        """Start a fight against a monster on the character's map.
+        Add participants for multi-character fights (up to 3 characters, only for boss)."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/fight",
+            CharacterFightResponseSchema,
+            "The fight ended successfully.",
+            {
+                486: "Only boss monsters can be fought by multiple characters.",
+                567: "This raid phase is not currently active.",
+                598: "Monster not found on this map.",
+            },
+            json={
+                "participants": participants,
             },
         )
