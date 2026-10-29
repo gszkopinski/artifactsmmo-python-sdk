@@ -159,3 +159,17 @@ class UnequipSchema(BaseModel):
 
     slot: ItemSlot
     quantity: int | None = None
+
+
+class UseItemSchema(BaseModel):
+    """UseItemSchema"""
+
+    cooldown: CooldownSchema
+    item: ItemSchema
+    character: CharacterSchema
+
+
+class UseItemResponseSchema(BaseModel):
+    """UseItemResponseSchema"""
+
+    data: UseItemSchema

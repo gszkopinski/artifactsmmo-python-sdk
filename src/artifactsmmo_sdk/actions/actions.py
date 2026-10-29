@@ -12,6 +12,7 @@ from ..models.actions import (
     EquipmentResponseSchema,
     EquipSchema,
     UnequipSchema,
+    UseItemResponseSchema,
 )
 
 
@@ -142,4 +143,32 @@ class Actions(BaseModule):
                 491: "The equipment slot is empty.",
             },
             json=[item.model_dump(mode="json", exclude_none=True) for item in items],
+        )
+
+    def use_item(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        code: Annotated[
+            str, Field(description="Item code.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+        quantity: Annotated[int, Field(description="Item quantity.", ge=1)],
+    ) -> tuple[str, UseItemResponseSchema | None]:
+        """Use an item as a consumable."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/use",
+            UseItemResponseSchema,
+            "The item has been successfully used.",
+            {
+                404: "Item not found.",
+                476: "This item is not a consumable.",
+                496: "Conditions not met.",
+            },
+            json={
+                "code": code,
+                "quantity": quantity,
+            },
         )
