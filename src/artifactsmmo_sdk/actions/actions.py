@@ -223,3 +223,33 @@ class Actions(BaseModule):
                 598: "Resource not found on this map.",
             },
         )
+
+    def crafting(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        code: Annotated[
+            str, Field(description="Craft code.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+        quantity: Annotated[
+            int | None, Field(description="Quantity of items to craft.", ge=1)
+        ] = None,
+    ) -> tuple[str, SkillResponseSchema | None]:
+        """Craft an item. The character must be on a map with a workshop."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/crafting",
+            SkillResponseSchema,
+            "The item was successfully crafted.",
+            {
+                404: "Craft not found.",
+                493: "The character's skill level is too low.",
+                598: "Workshop not found on this map.",
+            },
+            json={
+                "code": code,
+                "quantity": quantity,
+            },
+        )
