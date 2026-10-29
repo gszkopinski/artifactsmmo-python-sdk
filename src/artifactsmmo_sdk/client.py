@@ -10,6 +10,7 @@ from .actions import Actions
 from .base import build_session
 from .characters import Characters
 from .events import Events
+from .grand_exchange import GrandExchange
 from .items import Items
 from .maps import Maps
 from .monsters import Monsters
@@ -46,6 +47,7 @@ class ArtifactsClient:
         self.actions = Actions(api_url=self.api_url, session=self.session)
         self.characters = Characters(api_url=self.api_url, session=self.session)
         self.events = Events(api_url=self.api_url, session=self.session)
+        self.grand_exchange = GrandExchange(api_url=self.api_url, session=self.session)
         self.items = Items(api_url=self.api_url, session=self.session)
         self.maps = Maps(api_url=self.api_url, session=self.session)
         self.monsters = Monsters(api_url=self.api_url, session=self.session)
