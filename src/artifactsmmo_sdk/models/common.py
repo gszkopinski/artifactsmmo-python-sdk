@@ -82,12 +82,24 @@ class AchievementType(str, Enum):
     NPC_SELL = "npc_sell"
 
 
-class InventorySlotSchema(BaseModel):
-    """InventorySlotSchema"""
+class MapContentType(str, Enum):
+    """MapContentType."""
 
-    slot: int
+    MONSTER = "monster"
+    RESOURCE = "resource"
+    WORKSHOP = "workshop"
+    BANK = "bank"
+    GRAND_EXCHANGE = "grand_exchange"
+    TASKS_MASTER = "tasks_master"
+    NPC = "npc"
+    RAID = "raid"
+
+
+class MapContentSchema(BaseModel):
+    """MapContentSchema"""
+
+    type: MapContentType
     code: str
-    quantity: int
 
 
 class MapLayer(str, Enum):
@@ -96,6 +108,56 @@ class MapLayer(str, Enum):
     INTERIOR = "interior"
     OVERWORLD = "overworld"
     UNDERGROUND = "underground"
+
+
+class TransitionSchema(BaseModel):
+    """TransitionSchema"""
+
+    map_id: int
+    x: int
+    y: int
+    layer: MapLayer
+    conditions: list[ConditionSchema] | None = None
+
+
+class InteractionSchema(BaseModel):
+    """InteractionSchema"""
+
+    content: MapContentSchema | None = None
+    transition: TransitionSchema | None = None
+
+
+class MapSchema(BaseModel):
+    """MapSchema"""
+
+    map_id: int
+    name: str
+    skin: str
+    x: int
+    y: int
+    layer: MapLayer
+    access: AccessSchema
+    interactions: InteractionSchema
+
+
+class ActiveEventSchema(BaseModel):
+    """ActiveEventSchema"""
+
+    name: str
+    code: str
+    map: MapSchema
+    previous_map: MapSchema
+    duration: int
+    expiration: datetime
+    created_at: datetime
+
+
+class InventorySlotSchema(BaseModel):
+    """InventorySlotSchema"""
+
+    slot: int
+    code: str
+    quantity: int
 
 
 class StorageEffectSchema(BaseModel):
@@ -282,43 +344,6 @@ class DropRateSchema(BaseModel):
     max_quantity: int
 
 
-class MapContentType(str, Enum):
-    """MapContentType."""
-
-    MONSTER = "monster"
-    RESOURCE = "resource"
-    WORKSHOP = "workshop"
-    BANK = "bank"
-    GRAND_EXCHANGE = "grand_exchange"
-    TASKS_MASTER = "tasks_master"
-    NPC = "npc"
-    RAID = "raid"
-
-
-class MapContentSchema(BaseModel):
-    """MapContentSchema"""
-
-    type: MapContentType
-    code: str
-
-
-class TransitionSchema(BaseModel):
-    """TransitionSchema"""
-
-    map_id: int
-    x: int
-    y: int
-    layer: MapLayer
-    conditions: list[ConditionSchema] | None = None
-
-
-class InteractionSchema(BaseModel):
-    """InteractionSchema"""
-
-    content: MapContentSchema | None = None
-    transition: TransitionSchema | None = None
-
-
 class SimpleEffectSchema(BaseModel):
     """SimpleEffectSchema"""
 
@@ -361,19 +386,6 @@ class ItemType(str, Enum):
     CONSUMABLE = "consumable"
     RUNE = "rune"
     BAG = "bag"
-
-
-class MapSchema(BaseModel):
-    """MapSchema"""
-
-    map_id: int
-    name: str
-    skin: str
-    x: int
-    y: int
-    layer: MapLayer
-    access: AccessSchema
-    interactions: InteractionSchema
 
 
 class PendingItemSource(str, Enum):
