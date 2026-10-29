@@ -309,3 +309,26 @@ class Actions(BaseModule):
             },
             json=[item.model_dump(mode="json", exclude_none=True) for item in items],
         )
+
+    def withdraw_bank(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        items: Annotated[list[SimpleItemSchema], Field(description="")],
+    ) -> tuple[str, BankItemTransactionResponseSchema | None]:
+        """Take items from your bank and put them in the character's inventory.
+        The cooldown will be 3 seconds multiplied by the number of different items withdrawn."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/bank/withdraw/item",
+            BankItemTransactionResponseSchema,
+            "Items successfully withdrawn from your bank.",
+            {
+                404: "Item not found.",
+                461: "Some of your items or your gold in the bank are already part of an ongoing transaction.",
+                598: "Bank not found on this map.",
+            },
+            json=[item.model_dump(mode="json", exclude_none=True) for item in items],
+        )
