@@ -183,3 +183,24 @@ class Account(BaseModule):
                 "new_password": new_password,
             },
         )
+
+    def change_email(
+        self,
+        current_email: Annotated[str, Field(description="Your current email.")],
+        new_email: Annotated[str, Field(description="New email.")],
+    ) -> tuple[str, ResponseSchema | None]:
+        """Change your account email."""
+        return self._request(
+            "POST",
+            "/my/change_email",
+            ResponseSchema,
+            "Email changed successfully.",
+            {
+                457: "This email is already in use.",
+                463: "Please use a different email.",
+            },
+            json={
+                "current_email": current_email,
+                "new_email": new_email,
+            },
+        )

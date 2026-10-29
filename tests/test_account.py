@@ -296,3 +296,27 @@ def test_change_password_error(client, respond):
         "Please use a different password.",
         None,
     )
+
+
+def test_change_email(client, respond):
+    respond(200, {"message": "x"})
+    message, data = client.account.change_email(
+        current_email="a@b.co", new_email="a@b.co"
+    )
+    assert (message, data is not None) == ("Email changed successfully.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/change_email",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "current_email": "a@b.co",
+        "new_email": "a@b.co",
+    }
+
+
+def test_change_email_error(client, respond):
+    respond(457)
+    assert client.account.change_email(current_email="a@b.co", new_email="a@b.co") == (
+        "This email is already in use.",
+        None,
+    )
