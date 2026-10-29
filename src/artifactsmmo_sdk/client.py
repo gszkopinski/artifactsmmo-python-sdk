@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 from .account import Account
 from .accounts import Accounts
+from .achievements import Achievements
 from .actions import Actions
 from .base import build_session
 from .characters import Characters
@@ -47,6 +48,7 @@ class ArtifactsClient:
 
         self.account = Account(api_url=self.api_url, session=self.session)
         self.accounts = Accounts(api_url=self.api_url, session=self.session)
+        self.achievements = Achievements(api_url=self.api_url, session=self.session)
         self.actions = Actions(api_url=self.api_url, session=self.session)
         self.characters = Characters(api_url=self.api_url, session=self.session)
         self.effects = Effects(api_url=self.api_url, session=self.session)
