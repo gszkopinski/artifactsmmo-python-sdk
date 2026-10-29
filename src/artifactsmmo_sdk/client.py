@@ -8,6 +8,7 @@ from .account import Account
 from .accounts import Accounts
 from .achievements import Achievements
 from .actions import Actions
+from .badges import Badges
 from .base import build_session
 from .characters import Characters
 from .effects import Effects
@@ -50,6 +51,7 @@ class ArtifactsClient:
         self.accounts = Accounts(api_url=self.api_url, session=self.session)
         self.achievements = Achievements(api_url=self.api_url, session=self.session)
         self.actions = Actions(api_url=self.api_url, session=self.session)
+        self.badges = Badges(api_url=self.api_url, session=self.session)
         self.characters = Characters(api_url=self.api_url, session=self.session)
         self.effects = Effects(api_url=self.api_url, session=self.session)
         self.events = Events(api_url=self.api_url, session=self.session)
