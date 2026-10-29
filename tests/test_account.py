@@ -89,3 +89,31 @@ def test_get_ge_sell_history(client, respond):
         "http://api.test/my/grandexchange/history",
     )
     assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
+
+
+def test_get_account_details(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "username": "x",
+                "email": "a@b.co",
+                "member": True,
+                "member_expiration": "2024-01-01T00:00:00Z",
+                "status": "standard",
+                "badges": ["x"],
+                "skins": ["x"],
+                "gems": 1,
+                "member_token": 1,
+                "achievements_points": 1,
+                "banned": True,
+                "ban_reason": "x",
+            }
+        },
+    )
+    message, data = client.account.get_account_details()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/details",
+    )

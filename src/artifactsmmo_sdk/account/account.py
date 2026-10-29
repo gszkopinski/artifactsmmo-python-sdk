@@ -7,6 +7,7 @@ from pydantic import Field
 from ..base import BaseModule
 from ..models.account import (
     BankResponseSchema,
+    MyAccountDetailsSchema,
     SimpleItemSchemaPage,
 )
 from ..models.common import (
@@ -111,4 +112,15 @@ class Account(BaseModule):
                 "page": page,
                 "size": size,
             },
+        )
+
+    def get_account_details(
+        self,
+    ) -> tuple[str, MyAccountDetailsSchema | None]:
+        """Fetch account details."""
+        return self._request(
+            "GET",
+            "/my/details",
+            MyAccountDetailsSchema,
+            "Successfully fetched data.",
         )

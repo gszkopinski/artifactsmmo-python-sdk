@@ -6,6 +6,16 @@ from enum import Enum
 from pydantic import BaseModel
 
 
+class AccountStatus(str, Enum):
+    """AccountStatus."""
+
+    STANDARD = "standard"
+    FOUNDER = "founder"
+    GOLD_FOUNDER = "gold_founder"
+    VIP_FOUNDER = "vip_founder"
+    GOBLIN1 = "goblin1"
+
+
 class GEOrderHistorySchema(BaseModel):
     """GEOrderHistorySchema"""
 
