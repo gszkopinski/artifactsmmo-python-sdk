@@ -40,3 +40,9 @@ class StaticDataPage_TaskFullSchema_(BaseModel):
     page: int
     size: int
     pages: int
+
+
+class TaskFullResponseSchema(BaseModel):
+    """TaskFullResponseSchema"""
+
+    data: TaskFullSchema

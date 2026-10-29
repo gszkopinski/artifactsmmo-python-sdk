@@ -11,6 +11,7 @@ from ..models.common import (
 from ..models.tasks import (
     Skill,
     StaticDataPage_TaskFullSchema_,
+    TaskFullResponseSchema,
 )
 
 
@@ -43,5 +44,22 @@ class Tasks(BaseModule):
                 "type": type,
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_task(
+        self,
+        code: Annotated[
+            str, Field(description="The code of the task.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+    ) -> tuple[str, TaskFullResponseSchema | None]:
+        """Retrieve the details of a task."""
+        return self._request(
+            "GET",
+            f"/tasks/list/{code}",
+            TaskFullResponseSchema,
+            "Successfully fetched task.",
+            {
+                404: "task not found.",
             },
         )
