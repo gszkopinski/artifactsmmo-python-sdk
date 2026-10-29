@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.raids import (
+    RaidResponseSchema,
     StaticDataPage_RaidSchema_,
 )
 
@@ -39,5 +40,22 @@ class Raids(BaseModule):
                 "active": active,
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_raid(
+        self,
+        code: Annotated[
+            str, Field(description="The code of the raid.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+    ) -> tuple[str, RaidResponseSchema | None]:
+        """Retrieve the details of a specific raid."""
+        return self._request(
+            "GET",
+            f"/raids/{code}",
+            RaidResponseSchema,
+            "Successfully fetched raid.",
+            {
+                404: "raid not found.",
             },
         )

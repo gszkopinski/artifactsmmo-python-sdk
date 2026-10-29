@@ -98,6 +98,12 @@ class RaidSchema(BaseModel):
     latest_instance: RaidInstanceSchema | None = None
 
 
+class RaidResponseSchema(BaseModel):
+    """RaidResponseSchema"""
+
+    data: RaidSchema
+
+
 class StaticDataPage_RaidSchema_(BaseModel):
     """StaticDataPage[RaidSchema]"""
 
