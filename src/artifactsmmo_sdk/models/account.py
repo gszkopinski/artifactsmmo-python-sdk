@@ -2,6 +2,8 @@
 
 from pydantic import BaseModel
 
+from .common import SimpleItemSchema
+
 
 class BankSchema(BaseModel):
     """BankSchema"""
@@ -16,3 +18,13 @@ class BankResponseSchema(BaseModel):
     """BankResponseSchema"""
 
     data: BankSchema
+
+
+class DataPage_SimpleItemSchema_(BaseModel):
+    """DataPage[SimpleItemSchema]"""
+
+    data: list[SimpleItemSchema]
+    total: int
+    page: int
+    size: int
+    pages: int

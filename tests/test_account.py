@@ -9,3 +9,23 @@ def test_get_bank_details(client, respond):
     message, data = client.account.get_bank_details()
     assert (message, data is not None) == ("Successfully fetched data.", True)
     assert client.session.request.call_args.args == ("GET", "http://api.test/my/bank")
+
+
+def test_get_bank_items(client, respond):
+    respond(
+        200,
+        {
+            "data": [{"code": "x", "quantity": 1}],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.account.get_bank_items()
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/my/bank/items",
+    )
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
