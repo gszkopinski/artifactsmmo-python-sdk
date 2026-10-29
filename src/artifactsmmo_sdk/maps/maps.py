@@ -139,3 +139,18 @@ class Maps(BaseModule):
                 404: "map not found.",
             },
         )
+
+    def get_map_by_id(
+        self,
+        map_id: Annotated[int, Field(description="The unique ID of the map.")],
+    ) -> tuple[str, MapResponseSchema | None]:
+        """Retrieve the details of a map by its unique ID."""
+        return self._request(
+            "GET",
+            f"/maps/id/{map_id}",
+            MapResponseSchema,
+            "Successfully fetched map.",
+            {
+                404: "map not found.",
+            },
+        )
