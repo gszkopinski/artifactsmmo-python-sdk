@@ -11,6 +11,9 @@ from ..models.common import (
     GEOrderType,
     ItemType,
 )
+from ..models.grand_exchange import (
+    GEOrderResponseSchema,
+)
 
 
 class GrandExchange(BaseModule):
@@ -85,5 +88,22 @@ class GrandExchange(BaseModule):
                 "item_type": item_type,
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_ge_order(
+        self,
+        id: Annotated[
+            str, Field(description="The id of the order.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+    ) -> tuple[str, GEOrderResponseSchema | None]:
+        """Retrieve a specific order by ID."""
+        return self._request(
+            "GET",
+            f"/grandexchange/orders/{id}",
+            GEOrderResponseSchema,
+            "Successfully fetched GE order.",
+            {
+                404: "GE order not found.",
             },
         )
