@@ -5,6 +5,12 @@ from pydantic import BaseModel
 from .common import ItemSchema
 
 
+class ItemResponseSchema(BaseModel):
+    """ItemResponseSchema"""
+
+    data: ItemSchema
+
+
 class StaticDataPage_ItemSchema_(BaseModel):
     """StaticDataPage[ItemSchema]"""
 

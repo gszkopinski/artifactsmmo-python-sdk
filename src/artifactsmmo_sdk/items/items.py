@@ -10,6 +10,7 @@ from ..models.common import (
     ItemType,
 )
 from ..models.items import (
+    ItemResponseSchema,
     StaticDataPage_ItemSchema_,
 )
 
@@ -61,5 +62,22 @@ class Items(BaseModule):
                 "craft_material": craft_material,
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_item(
+        self,
+        code: Annotated[
+            str, Field(description="The code of the item.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+    ) -> tuple[str, ItemResponseSchema | None]:
+        """Retrieve the details of a item."""
+        return self._request(
+            "GET",
+            f"/items/{code}",
+            ItemResponseSchema,
+            "Successfully fetched item.",
+            {
+                404: "item not found.",
             },
         )
