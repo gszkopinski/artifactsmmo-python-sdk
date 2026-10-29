@@ -314,6 +314,21 @@ class GETransactionResponseSchema(BaseModel):
     data: GETransactionListSchema
 
 
+class GiveGoldDataSchema(BaseModel):
+    """GiveGoldDataSchema"""
+
+    cooldown: CooldownSchema
+    quantity: int
+    receiver_character: CharacterSchema
+    character: CharacterSchema
+
+
+class GiveGoldResponseSchema(BaseModel):
+    """GiveGoldResponseSchema"""
+
+    data: GiveGoldDataSchema
+
+
 class NpcItemTransactionSchema(BaseModel):
     """NpcItemTransactionSchema"""
 

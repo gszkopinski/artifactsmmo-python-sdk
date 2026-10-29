@@ -17,6 +17,7 @@ from ..models.actions import (
     EquipSchema,
     GECreateOrderTransactionResponseSchema,
     GETransactionResponseSchema,
+    GiveGoldResponseSchema,
     NpcMerchantTransactionResponseSchema,
     RecyclingResponseSchema,
     RewardDataResponseSchema,
@@ -736,5 +737,35 @@ class Actions(BaseModule):
             {
                 487: "The character has no task assigned.",
                 598: "Tasks Master not found on this map.",
+            },
+        )
+
+    def give_gold(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        quantity: Annotated[int, Field(description="Gold quantity.", ge=1)],
+        character: Annotated[
+            str,
+            Field(
+                description="Character name. The name of the character who will receive the gold.",
+                pattern="^[a-zA-Z0-9_-]+$",
+            ),
+        ],
+    ) -> tuple[str, GiveGoldResponseSchema | None]:
+        """Give gold to another character in your account on the same map."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/give/gold",
+            GiveGoldResponseSchema,
+            "Gold given successfully.",
+            {
+                492: "The character does not have enough gold.",
+            },
+            json={
+                "quantity": quantity,
+                "character": character,
             },
         )
