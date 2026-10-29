@@ -13,14 +13,15 @@ DEFAULT_TIMEOUT = 30
 
 SchemaT = TypeVar("SchemaT", bound=BaseModel)
 
-# Messages shared by most endpoints. Endpoint specific codes are passed to
+# Messages of the API spec shared by most endpoints. Endpoint specific codes are passed to
 # `_request(errors=...)` and take precedence over these.
 COMMON_ERRORS: dict[int, str] = {
     422: "Request could not be processed due to an invalid payload.",
+    478: "Missing required item(s).",
     486: "An action is already in progress for this character.",
-    496: "Conditions not met.",
+    497: "The character's inventory is full.",
     498: "Character not found.",
-    499: "Character in cooldown.",
+    499: "The character is in cooldown.",
 }
 
 
@@ -92,7 +93,7 @@ class BaseModule:
 
         `data` is None when the call failed. Status codes found in `errors`
         (then in COMMON_ERRORS) give their message, others give a generic one.
-        None values in `params` are dropped.
+        None values in `params` and in a dict `json` are dropped.
         """
         try:
             response = self.session.request(
@@ -103,7 +104,11 @@ class BaseModule:
                     for k, v in (params or {}).items()
                     if v is not None
                 },
-                json=json,
+                json=(
+                    {k: v for k, v in json.items() if v is not None}
+                    if isinstance(json, dict)
+                    else json
+                ),
             )
             response.raise_for_status()
             return success, schema.model_validate(response.json())

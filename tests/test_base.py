@@ -1,11 +1,18 @@
 """Unit tests for the shared request plumbing and the client."""
 
+from enum import Enum
+
 import pytest
 from pydantic import BaseModel
 
 from artifactsmmo_sdk import ArtifactsClient
 from artifactsmmo_sdk.base import COMMON_ERRORS, SessionAdapter, build_session
-from artifactsmmo_sdk.models.items import TypeItemEnum
+
+
+class Kind(str, Enum):
+    """Enum sent as a query param."""
+
+    WEAPON = "weapon"
 
 
 class Dummy(BaseModel):
@@ -71,6 +78,18 @@ def test_unknown_error(client, respond):
 def test_params_drop_none_and_unwrap_enums(client, respond):
     respond(200, {"ok": True})
     client.items._request(
-        "GET", "/x", Dummy, "done", params={"a": None, "type": TypeItemEnum.WEAPON}
+        "GET", "/x", Dummy, "done", params={"a": None, "type": Kind.WEAPON}
     )
     assert client.session.request.call_args.kwargs["params"] == {"type": "weapon"}
+
+
+def test_json_drops_none_values(client, respond):
+    respond(200, {"ok": True})
+    client.items._request("POST", "/x", Dummy, "done", json={"a": 1, "b": None})
+    assert client.session.request.call_args.kwargs["json"] == {"a": 1}
+
+
+def test_json_list_is_sent_as_is(client, respond):
+    respond(200, {"ok": True})
+    client.items._request("POST", "/x", Dummy, "done", json=[{"a": 1}])
+    assert client.session.request.call_args.kwargs["json"] == [{"a": 1}]
