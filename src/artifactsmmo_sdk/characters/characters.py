@@ -98,3 +98,21 @@ class Characters(BaseModule):
                 "size": size,
             },
         )
+
+    def get_character(
+        self,
+        name: Annotated[
+            str,
+            Field(description="The name of the character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, CharacterResponseSchema | None]:
+        """Retrieve the details of a character."""
+        return self._request(
+            "GET",
+            f"/characters/{name}",
+            CharacterResponseSchema,
+            "Successfully fetched character.",
+            {
+                404: "character not found.",
+            },
+        )
