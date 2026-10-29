@@ -272,3 +272,27 @@ def test_get_rate_limits(client, respond):
     message, data = client.account.get_rate_limits()
     assert (message, data is not None) == ("Successfully fetched rate limits.", True)
     assert client.session.request.call_args.args == ("GET", "http://api.test/my/rates")
+
+
+def test_change_password(client, respond):
+    respond(200, {"message": "x"})
+    message, data = client.account.change_password(
+        current_password="x", new_password="x"
+    )
+    assert (message, data is not None) == ("Password changed successfully.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/change_password",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "current_password": "x",
+        "new_password": "x",
+    }
+
+
+def test_change_password_error(client, respond):
+    respond(458)
+    assert client.account.change_password(current_password="x", new_password="x") == (
+        "Please use a different password.",
+        None,
+    )

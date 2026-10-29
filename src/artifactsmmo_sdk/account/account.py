@@ -16,6 +16,7 @@ from ..models.common import (
     GEOrderHistorySchemaPage,
     GEOrderSchemaPage,
     GEOrderType,
+    ResponseSchema,
 )
 
 
@@ -156,4 +157,29 @@ class Account(BaseModule):
             "/my/rates",
             RateLimitsSchema,
             "Successfully fetched rate limits.",
+        )
+
+    def change_password(
+        self,
+        current_password: Annotated[
+            str, Field(description="Your password.", pattern="^[^\\s]+$")
+        ],
+        new_password: Annotated[
+            str, Field(description="New password.", pattern="^[^\\s]+$")
+        ],
+    ) -> tuple[str, ResponseSchema | None]:
+        """Change your account password. Changing the password reset the account token."""
+        return self._request(
+            "POST",
+            "/my/change_password",
+            ResponseSchema,
+            "Password changed successfully.",
+            {
+                458: "Please use a different password.",
+                459: "The current password you entered is invalid.",
+            },
+            json={
+                "current_password": current_password,
+                "new_password": new_password,
+            },
         )

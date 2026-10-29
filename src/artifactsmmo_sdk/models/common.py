@@ -116,6 +116,12 @@ class RateLimitScopeSchema(BaseModel):
     day: RateLimitWindowSchema | None = None
 
 
+class ResponseSchema(BaseModel):
+    """ResponseSchema"""
+
+    message: str
+
+
 class RewardType(str, Enum):
     """RewardType."""
 
