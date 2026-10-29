@@ -559,3 +559,41 @@ class Actions(BaseModule):
                 "id": id,
             },
         )
+
+    def ge_create_buy_order(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        code: Annotated[
+            str, Field(description="Item code.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+        quantity: Annotated[int, Field(description="Item quantity.", ge=1)],
+        price: Annotated[
+            int, Field(description="Item price per unit.", ge=1, le=1000000000)
+        ],
+    ) -> tuple[str, GECreateOrderTransactionResponseSchema | None]:
+        """Create a buy order at the Grand Exchange on the character's map.
+
+        The total gold (price * quantity) is locked when creating the order.
+        Other players can then sell items to fulfill your order.
+        Items will be delivered to your pending items when the order is filled."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/grandexchange/create_buy_order",
+            GECreateOrderTransactionResponseSchema,
+            "The buy order has been successfully created.",
+            {
+                404: "Item not found.",
+                433: "You cannot create more than 100 orders at the same time.",
+                437: "This item cannot be sold.",
+                492: "The character does not have enough gold.",
+                598: "Grand Exchange not found on this map.",
+            },
+            json={
+                "code": code,
+                "quantity": quantity,
+                "price": price,
+            },
+        )
