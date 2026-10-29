@@ -75,6 +75,20 @@ class CharacterMovementResponseSchema(BaseModel):
     data: CharacterMovementDataSchema
 
 
+class CharacterRestDataSchema(BaseModel):
+    """CharacterRestDataSchema"""
+
+    cooldown: CooldownSchema
+    hp_restored: int
+    character: CharacterSchema
+
+
+class CharacterRestResponseSchema(BaseModel):
+    """CharacterRestResponseSchema"""
+
+    data: CharacterRestDataSchema
+
+
 class CharacterTransitionDataSchema(BaseModel):
     """CharacterTransitionDataSchema"""
 

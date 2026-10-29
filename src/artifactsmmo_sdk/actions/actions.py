@@ -7,6 +7,7 @@ from pydantic import Field
 from ..base import BaseModule
 from ..models.actions import (
     CharacterMovementResponseSchema,
+    CharacterRestResponseSchema,
     CharacterTransitionResponseSchema,
 )
 
@@ -70,4 +71,19 @@ class Actions(BaseModule):
                 492: "Insufficient gold for this transition.",
                 496: "Conditions not met.",
             },
+        )
+
+    def rest(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, CharacterRestResponseSchema | None]:
+        """Recovers hit points by resting. (1 second per 5 HP, minimum 3 seconds)"""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/rest",
+            CharacterRestResponseSchema,
+            "The character has rested successfully.",
         )
