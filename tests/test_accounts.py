@@ -220,3 +220,32 @@ def test_reset_password_error(client, respond):
         "The password reset token is invalid.",
         None,
     )
+
+
+def test_get_account(client, respond):
+    respond(
+        200,
+        {
+            "data": {
+                "username": "x",
+                "member": True,
+                "status": "standard",
+                "badges": ["x"],
+                "skins": ["x"],
+                "achievements_points": 1,
+                "banned": True,
+                "ban_reason": "x",
+            }
+        },
+    )
+    message, data = client.accounts.get_account(account="x")
+    assert (message, data is not None) == ("Successfully fetched account.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/accounts/x",
+    )
+
+
+def test_get_account_error(client, respond):
+    respond(404)
+    assert client.accounts.get_account(account="x") == ("account not found.", None)

@@ -7,6 +7,7 @@ from pydantic import Field
 from ..base import BaseModule
 from ..models.accounts import (
     AccountAchievementSchemaPage,
+    AccountDetailsSchema,
     CharactersListSchema,
     PasswordResetResponseSchema,
 )
@@ -129,5 +130,23 @@ class Accounts(BaseModule):
             json={
                 "token": token,
                 "new_password": new_password,
+            },
+        )
+
+    def get_account(
+        self,
+        account: Annotated[
+            str,
+            Field(description="The name of the account.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, AccountDetailsSchema | None]:
+        """Retrieve the details of an account."""
+        return self._request(
+            "GET",
+            f"/accounts/{account}",
+            AccountDetailsSchema,
+            "Successfully fetched account.",
+            {
+                404: "account not found.",
             },
         )
