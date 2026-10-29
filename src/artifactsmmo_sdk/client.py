@@ -15,6 +15,7 @@ from .grand_exchange import GrandExchange
 from .items import Items
 from .maps import Maps
 from .monsters import Monsters
+from .npcs import Npcs
 from .resources import Resources
 from .server import Server
 from .token import Token
@@ -53,6 +54,7 @@ class ArtifactsClient:
         self.items = Items(api_url=self.api_url, session=self.session)
         self.maps = Maps(api_url=self.api_url, session=self.session)
         self.monsters = Monsters(api_url=self.api_url, session=self.session)
+        self.npcs = Npcs(api_url=self.api_url, session=self.session)
         self.resources = Resources(api_url=self.api_url, session=self.session)
         self.server = Server(api_url=self.api_url, session=self.session)
         self.token = Token(api_url=self.api_url, session=self.session)
