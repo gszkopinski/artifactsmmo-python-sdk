@@ -4382,3 +4382,36 @@ def test_rename_error(client, respond):
         "Character not found.",
         None,
     )
+
+
+def test_get_all_character_logs(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "character": "x",
+                    "account": "x",
+                    "type": "spawn",
+                    "description": "x",
+                    "content": None,
+                    "cooldown": 1,
+                    "cooldown_expiration": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                }
+            ],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.actions.get_all_character_logs()
+    assert (message, data is not None) == ("Successfully fetched logs.", True)
+    assert client.session.request.call_args.args == ("GET", "http://api.test/my/logs")
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
+
+
+def test_get_all_character_logs_error(client, respond):
+    respond(404)
+    assert client.actions.get_all_character_logs() == ("Logs not found.", None)

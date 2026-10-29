@@ -22,6 +22,7 @@ from ..models.actions import (
     GETransactionResponseSchema,
     GiveGoldResponseSchema,
     GiveItemResponseSchema,
+    LogSchemaPage,
     NpcMerchantTransactionResponseSchema,
     RecyclingResponseSchema,
     RenameResponseSchema,
@@ -909,5 +910,25 @@ class Actions(BaseModule):
             },
             json={
                 "name": new_name,
+            },
+        )
+
+    def get_all_character_logs(
+        self,
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=100)] = 50,
+    ) -> tuple[str, LogSchemaPage | None]:
+        """History of the last 5000 actions of all your characters."""
+        return self._request(
+            "GET",
+            "/my/logs",
+            LogSchemaPage,
+            "Successfully fetched logs.",
+            {
+                404: "Logs not found.",
+            },
+            params={
+                "page": page,
+                "size": size,
             },
         )

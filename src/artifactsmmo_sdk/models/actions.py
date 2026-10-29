@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -242,6 +243,81 @@ class ClaimPendingItemResponseSchema(BaseModel):
     """Response schema for claim pending item action."""
 
     data: ClaimPendingItemDataSchema
+
+
+class LogType(str, Enum):
+    """LogType."""
+
+    SPAWN = "spawn"
+    DELETE_CHARACTER = "delete_character"
+    MOVEMENT = "movement"
+    FIGHT = "fight"
+    RAID_FIGHT = "raid_fight"
+    MULTI_FIGHT = "multi_fight"
+    CRAFTING = "crafting"
+    GATHERING = "gathering"
+    BUY_GE = "buy_ge"
+    SELL_GE = "sell_ge"
+    CREATE_BUY_ORDER_GE = "create_buy_order_ge"
+    FILL_BUY_ORDER_GE = "fill_buy_order_ge"
+    BUY_NPC = "buy_npc"
+    SELL_NPC = "sell_npc"
+    CANCEL_GE = "cancel_ge"
+    DELETE_ITEM = "delete_item"
+    DEPOSIT_ITEM = "deposit_item"
+    WITHDRAW_ITEM = "withdraw_item"
+    DEPOSIT_GOLD = "deposit_gold"
+    WITHDRAW_GOLD = "withdraw_gold"
+    EQUIP = "equip"
+    UNEQUIP = "unequip"
+    NEW_TASK = "new_task"
+    TASK_EXCHANGE = "task_exchange"
+    TASK_CANCELLED = "task_cancelled"
+    TASK_COMPLETED = "task_completed"
+    TASK_TRADE = "task_trade"
+    RECYCLING = "recycling"
+    REST = "rest"
+    USE = "use"
+    BUY_BANK_EXPANSION = "buy_bank_expansion"
+    ACHIEVEMENT = "achievement"
+    GIVE_ITEM = "give_item"
+    GIVE_GOLD = "give_gold"
+    RECEIVE_ITEM = "receive_item"
+    RECEIVE_GOLD = "receive_gold"
+    RAID_DEPOSIT = "raid_deposit"
+    CHANGE_SKIN = "change_skin"
+    RENAME = "rename"
+    TRANSITION = "transition"
+    CLAIM_ITEM = "claim_item"
+    SANDBOX_GIVE_GOLD = "sandbox_give_gold"
+    SANDBOX_GIVE_ITEM = "sandbox_give_item"
+    SANDBOX_GIVE_XP = "sandbox_give_xp"
+    SANDBOX_RESET_ACCOUNT = "sandbox_reset_account"
+    SANDBOX_CLEAR_COOLDOWN = "sandbox_clear_cooldown"
+    SANDBOX_TELEPORT = "sandbox_teleport"
+
+
+class LogSchema(BaseModel):
+    """LogSchema"""
+
+    character: str
+    account: str
+    type: LogType
+    description: str
+    content: Any
+    cooldown: int
+    cooldown_expiration: datetime | None = None
+    created_at: datetime
+
+
+class LogSchemaPage(BaseModel):
+    """DataPage[LogSchema]"""
+
+    data: list[LogSchema]
+    total: int
+    page: int
+    size: int
+    pages: int
 
 
 class DeleteItemSchema(BaseModel):
