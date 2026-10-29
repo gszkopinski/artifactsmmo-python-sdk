@@ -597,3 +597,36 @@ class Actions(BaseModule):
                 "price": price,
             },
         )
+
+    def ge_fill(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        id: Annotated[str, Field(description="Buy order id.")],
+        quantity: Annotated[
+            int, Field(description="Item quantity to sell.", ge=1, le=100)
+        ],
+    ) -> tuple[str, GETransactionResponseSchema | None]:
+        """Sell items to an existing buy order at the Grand Exchange on the character's map.
+
+        You will receive the gold immediately.
+        The buyer will receive the items in their pending items."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/grandexchange/fill",
+            GETransactionResponseSchema,
+            "Successfully sold items to the buy order.",
+            {
+                404: "Buy order not found.",
+                434: "This offer does not contain that many items.",
+                435: "You cannot trade with yourself.",
+                436: "A transaction is already in progress for this order by another character.",
+                598: "Grand Exchange not found on this map.",
+            },
+            json={
+                "id": id,
+                "quantity": quantity,
+            },
+        )
