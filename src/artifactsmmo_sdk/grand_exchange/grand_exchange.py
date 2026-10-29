@@ -7,6 +7,9 @@ from pydantic import Field
 from ..base import BaseModule
 from ..models.common import (
     GEOrderHistorySchemaPage,
+    GEOrderSchemaPage,
+    GEOrderType,
+    ItemType,
 )
 
 
@@ -39,6 +42,47 @@ class GrandExchange(BaseModule):
             },
             params={
                 "account": account,
+                "page": page,
+                "size": size,
+            },
+        )
+
+    def get_ge_orders(
+        self,
+        code: Annotated[
+            str | None,
+            Field(description="The code of the item.", pattern="^[a-zA-Z0-9_-]+$"),
+        ] = None,
+        account: Annotated[
+            str | None,
+            Field(
+                description="The account that sells or buys items.",
+                pattern="^[a-zA-Z0-9_-]+$",
+            ),
+        ] = None,
+        type: Annotated[
+            GEOrderType | None, Field(description="Filter by order type (sell or buy).")
+        ] = None,
+        item_type: Annotated[
+            ItemType | None, Field(description="Filter by item type.")
+        ] = None,
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=100)] = 50,
+    ) -> tuple[str, GEOrderSchemaPage | None]:
+        """Fetch all orders (sell and buy orders).
+
+        Use the `type` parameter to filter by order type; when using `account`, `type`
+        is required to keep account searches explicit."""
+        return self._request(
+            "GET",
+            "/grandexchange/orders",
+            GEOrderSchemaPage,
+            "Successfully fetched GE orders.",
+            params={
+                "code": code,
+                "account": account,
+                "type": type,
+                "item_type": item_type,
                 "page": page,
                 "size": size,
             },

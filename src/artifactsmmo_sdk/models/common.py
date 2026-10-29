@@ -334,6 +334,26 @@ class ItemSchema(BaseModel):
     recyclable: bool | None = None
 
 
+class ItemType(str, Enum):
+    """ItemType."""
+
+    UTILITY = "utility"
+    BODY_ARMOR = "body_armor"
+    WEAPON = "weapon"
+    RESOURCE = "resource"
+    LEG_ARMOR = "leg_armor"
+    HELMET = "helmet"
+    BOOTS = "boots"
+    SHIELD = "shield"
+    AMULET = "amulet"
+    RING = "ring"
+    ARTIFACT = "artifact"
+    CURRENCY = "currency"
+    CONSUMABLE = "consumable"
+    RUNE = "rune"
+    BAG = "bag"
+
+
 class MapSchema(BaseModel):
     """MapSchema"""
 

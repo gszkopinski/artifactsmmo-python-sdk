@@ -37,3 +37,33 @@ def test_get_ge_history_error(client, respond):
         "item history not found.",
         None,
     )
+
+
+def test_get_ge_orders(client, respond):
+    respond(
+        200,
+        {
+            "data": [
+                {
+                    "id": "x",
+                    "type": "sell",
+                    "account": "x",
+                    "code": "x",
+                    "quantity": 1,
+                    "price": 1,
+                    "created_at": "2024-01-01T00:00:00Z",
+                }
+            ],
+            "total": 1,
+            "page": 1,
+            "size": 1,
+            "pages": 1,
+        },
+    )
+    message, data = client.grand_exchange.get_ge_orders()
+    assert (message, data is not None) == ("Successfully fetched GE orders.", True)
+    assert client.session.request.call_args.args == (
+        "GET",
+        "http://api.test/grandexchange/orders",
+    )
+    assert client.session.request.call_args.kwargs["params"] == {"page": 1, "size": 50}
