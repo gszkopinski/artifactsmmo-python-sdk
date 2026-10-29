@@ -16,6 +16,36 @@ class AccountStatus(str, Enum):
     GOBLIN1 = "goblin1"
 
 
+class RewardItemSchema(BaseModel):
+    """Schema for a single item reward."""
+
+    code: str
+    quantity: int
+
+
+class AchievementRewardsSchema(BaseModel):
+    """Schema for achievement rewards including gold and items."""
+
+    gold: int | None = None
+    items: list[RewardItemSchema] | None = None
+
+
+class AchievementType(str, Enum):
+    """AchievementType."""
+
+    COMBAT_KILL = "combat_kill"
+    COMBAT_DROP = "combat_drop"
+    COMBAT_LEVEL = "combat_level"
+    GATHERING = "gathering"
+    CRAFTING = "crafting"
+    RECYCLING = "recycling"
+    TASK = "task"
+    OTHER = "other"
+    USE = "use"
+    NPC_BUY = "npc_buy"
+    NPC_SELL = "npc_sell"
+
+
 class GEOrderHistorySchema(BaseModel):
     """GEOrderHistorySchema"""
 
