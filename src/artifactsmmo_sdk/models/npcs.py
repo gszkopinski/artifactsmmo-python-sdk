@@ -31,6 +31,12 @@ class NPCSchema(BaseModel):
     items: list[SimpleNPCItemSchema] | None = None
 
 
+class NPCResponseSchema(BaseModel):
+    """NPCResponseSchema"""
+
+    data: NPCSchema
+
+
 class StaticDataPage_NPCSchema_(BaseModel):
     """StaticDataPage[NPCSchema]"""
 

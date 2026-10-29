@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.npcs import (
+    NPCResponseSchema,
     NPCType,
     StaticDataPage_NPCSchema_,
 )
@@ -54,5 +55,22 @@ class Npcs(BaseModule):
                 "item": item,
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_npc(
+        self,
+        code: Annotated[
+            str, Field(description="The code of the NPC.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+    ) -> tuple[str, NPCResponseSchema | None]:
+        """Retrieve the details of a NPC."""
+        return self._request(
+            "GET",
+            f"/npcs/details/{code}",
+            NPCResponseSchema,
+            "Successfully fetched NPC.",
+            {
+                404: "NPC not found.",
             },
         )
