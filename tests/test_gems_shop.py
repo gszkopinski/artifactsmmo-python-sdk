@@ -42,3 +42,19 @@ def test_get_catalog(client, respond):
         "GET",
         "http://api.test/gems_shop/",
     )
+
+
+def test_buy_skin(client, respond):
+    respond(200, {"data": {"skins": ["x"], "skin": "x", "gems": 1}})
+    message, data = client.gems_shop.buy_skin(code="x")
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/gems_shop/skin",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"code": "x"}
+
+
+def test_buy_skin_error(client, respond):
+    respond(404)
+    assert client.gems_shop.buy_skin(code="x") == ("Skin not found.", None)

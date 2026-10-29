@@ -7,6 +7,20 @@ from pydantic import BaseModel
 from .common import MapContentType
 
 
+class BuySkinResponseDataSchema(BaseModel):
+    """BuySkinResponseDataSchema"""
+
+    skins: list[str]
+    skin: str
+    gems: int
+
+
+class BuySkinResponseSchema(BaseModel):
+    """BuySkinResponseSchema"""
+
+    data: BuySkinResponseDataSchema
+
+
 class GemShopCustomDesignCatalogItemSchema(BaseModel):
     """GemShopCustomDesignCatalogItemSchema"""
 
