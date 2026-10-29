@@ -455,3 +455,19 @@ def test_get_my_gems_history(client, respond):
         "GET",
         "http://api.test/my/gems_history",
     )
+
+
+def test_buy_gems(client, respond):
+    respond(200, {"data": {"checkout_url": "x", "session_id": "x"}})
+    message, data = client.account.buy_gems(quantity=500)
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/my/buy_gems",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"quantity": 500}
+
+
+def test_buy_gems_error(client, respond):
+    respond(404)
+    assert client.account.buy_gems(quantity=500) == ("Gem pack not found.", None)

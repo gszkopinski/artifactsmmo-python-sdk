@@ -1,6 +1,6 @@
 """Account."""
 
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import Field
 
@@ -306,4 +306,25 @@ class Account(BaseModule):
             "/my/gems_history",
             GemTransactionListResponseSchema,
             "Successfully fetched data.",
+        )
+
+    def buy_gems(
+        self,
+        quantity: Annotated[
+            Literal[500, 1100, 2400, 6125, 12500],
+            Field(description="Number of gems to purchase."),
+        ],
+    ) -> tuple[str, CheckoutResponseWrapperSchema | None]:
+        """Purchase gems. Returns a Stripe checkout URL for payment."""
+        return self._request(
+            "POST",
+            "/my/buy_gems",
+            CheckoutResponseWrapperSchema,
+            "Successfully fetched data.",
+            {
+                404: "Gem pack not found.",
+            },
+            json={
+                "quantity": quantity,
+            },
         )
