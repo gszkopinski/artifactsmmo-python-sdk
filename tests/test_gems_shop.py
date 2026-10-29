@@ -154,3 +154,22 @@ def test_buy_subscription(client, respond):
 def test_buy_subscription_error(client, respond):
     respond(563)
     assert client.gems_shop.buy_subscription() == ("Insufficient gems.", None)
+
+
+def test_buy_custom_design(client, respond):
+    respond(200, {"data": {"code": "x", "name": "x", "gems": 1, "cost": 1}})
+    message, data = client.gems_shop.buy_custom_design(code="x")
+    assert (message, data is not None) == ("Successfully fetched data.", True)
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/gems_shop/buy_custom_design",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {"code": "x"}
+
+
+def test_buy_custom_design_error(client, respond):
+    respond(404)
+    assert client.gems_shop.buy_custom_design(code="x") == (
+        "Custom design not found.",
+        None,
+    )

@@ -83,6 +83,21 @@ class GemShopCatalogResponseSchema(BaseModel):
     data: GemShopCatalogDataSchema
 
 
+class GemShopCustomDesignPurchaseResponseDataSchema(BaseModel):
+    """GemShopCustomDesignPurchaseResponseDataSchema"""
+
+    code: str
+    name: str
+    gems: int
+    cost: int
+
+
+class GemShopCustomDesignPurchaseResponseSchema(BaseModel):
+    """GemShopCustomDesignPurchaseResponseSchema"""
+
+    data: GemShopCustomDesignPurchaseResponseDataSchema
+
+
 class GemShopSubscriptionResponseDataSchema(BaseModel):
     """GemShopSubscriptionResponseDataSchema"""
 

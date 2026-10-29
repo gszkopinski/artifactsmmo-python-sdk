@@ -9,6 +9,7 @@ from ..models.gems_shop import (
     ActiveEventResponseSchema,
     BuySkinResponseSchema,
     GemShopCatalogResponseSchema,
+    GemShopCustomDesignPurchaseResponseSchema,
     GemShopSubscriptionResponseSchema,
 )
 
@@ -82,5 +83,26 @@ class GemsShop(BaseModule):
             {
                 563: "Insufficient gems.",
                 573: "An active Stripe subscription cannot be extended with gems or member tokens.",
+            },
+        )
+
+    def buy_custom_design(
+        self,
+        code: Annotated[
+            str, Field(description="Code of the custom design to purchase.")
+        ],
+    ) -> tuple[str, GemShopCustomDesignPurchaseResponseSchema | None]:
+        """Buy a custom design using gems."""
+        return self._request(
+            "POST",
+            "/gems_shop/buy_custom_design",
+            GemShopCustomDesignPurchaseResponseSchema,
+            "Successfully fetched data.",
+            {
+                404: "Custom design not found.",
+                563: "Insufficient gems.",
+            },
+            json={
+                "code": code,
             },
         )
