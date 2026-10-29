@@ -1,8 +1,27 @@
 """Leaderboard schemas."""
 
+from datetime import datetime
 from enum import Enum
 
 from pydantic import BaseModel
+
+
+class AccountLeaderboardSchema(BaseModel):
+    """AccountLeaderboardSchema"""
+
+    position: int
+    account: str
+    member: bool
+    achievements_points: int
+    completed_at: datetime | None = None
+    gold: int
+
+
+class AccountLeaderboardType(str, Enum):
+    """AccountLeaderboardType."""
+
+    ACHIEVEMENTS_POINTS = "achievements_points"
+    GOLD = "gold"
 
 
 class CharacterLeaderboardSchema(BaseModel):
@@ -46,6 +65,16 @@ class CharacterLeaderboardType(str, Enum):
     JEWELRYCRAFTING = "jewelrycrafting"
     COOKING = "cooking"
     ALCHEMY = "alchemy"
+
+
+class AccountLeaderboardSchemaPage(BaseModel):
+    """DataPage[AccountLeaderboardSchema]"""
+
+    data: list[AccountLeaderboardSchema]
+    total: int
+    page: int
+    size: int
+    pages: int
 
 
 class CharacterLeaderboardSchemaPage(BaseModel):
