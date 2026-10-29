@@ -273,6 +273,15 @@ class GEOrderSchemaPage(BaseModel):
     pages: int
 
 
+class DropRateSchema(BaseModel):
+    """DropRateSchema"""
+
+    code: str
+    rate: int
+    min_quantity: int
+    max_quantity: int
+
+
 class MapContentType(str, Enum):
     """MapContentType."""
 
