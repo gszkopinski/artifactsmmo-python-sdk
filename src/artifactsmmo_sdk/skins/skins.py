@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.skins import (
+    SkinResponseSchema,
     StaticDataPage_SkinSchema_,
 )
 
@@ -27,5 +28,22 @@ class Skins(BaseModule):
             params={
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_skin(
+        self,
+        code: Annotated[
+            str, Field(description="The code of the skin.", pattern="^[a-zA-Z0-9_-]+$")
+        ],
+    ) -> tuple[str, SkinResponseSchema | None]:
+        """Retrieve the details of a skin."""
+        return self._request(
+            "GET",
+            f"/skins/{code}",
+            SkinResponseSchema,
+            "Successfully fetched skin.",
+            {
+                404: "skin not found.",
             },
         )

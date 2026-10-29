@@ -13,6 +13,12 @@ class SkinSchema(BaseModel):
     price: int | None = None
 
 
+class SkinResponseSchema(BaseModel):
+    """SkinResponseSchema"""
+
+    data: SkinSchema
+
+
 class StaticDataPage_SkinSchema_(BaseModel):
     """StaticDataPage[SkinSchema]"""
 
