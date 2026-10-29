@@ -18,6 +18,7 @@ from ..models.actions import (
     GECreateOrderTransactionResponseSchema,
     GETransactionResponseSchema,
     GiveGoldResponseSchema,
+    GiveItemResponseSchema,
     NpcMerchantTransactionResponseSchema,
     RecyclingResponseSchema,
     RewardDataResponseSchema,
@@ -766,6 +767,39 @@ class Actions(BaseModule):
             },
             json={
                 "quantity": quantity,
+                "character": character,
+            },
+        )
+
+    def give_items(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        items: Annotated[
+            list[SimpleItemSchema], Field(description="List of items to give")
+        ],
+        character: Annotated[
+            str,
+            Field(
+                description="Character name. The name of the character who will receive the items.",
+                pattern="^[a-zA-Z0-9_-]+$",
+            ),
+        ],
+    ) -> tuple[str, GiveItemResponseSchema | None]:
+        """Give items to another character in your account on the same map.
+        The cooldown will be 3 seconds multiplied by the number of different items given."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/give/item",
+            GiveItemResponseSchema,
+            "Items given successfully.",
+            {
+                404: "Item not found.",
+            },
+            json={
+                "items": items,
                 "character": character,
             },
         )

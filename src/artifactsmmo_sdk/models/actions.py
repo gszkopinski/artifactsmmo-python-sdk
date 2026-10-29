@@ -329,6 +329,21 @@ class GiveGoldResponseSchema(BaseModel):
     data: GiveGoldDataSchema
 
 
+class GiveItemDataSchema(BaseModel):
+    """GiveItemDataSchema"""
+
+    cooldown: CooldownSchema
+    items: list[SimpleItemSchema]
+    receiver_character: CharacterSchema
+    character: CharacterSchema
+
+
+class GiveItemResponseSchema(BaseModel):
+    """GiveItemResponseSchema"""
+
+    data: GiveItemDataSchema
+
+
 class NpcItemTransactionSchema(BaseModel):
     """NpcItemTransactionSchema"""
 
