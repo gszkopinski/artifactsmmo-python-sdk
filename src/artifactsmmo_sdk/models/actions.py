@@ -9,6 +9,7 @@ from .common import (
     CharacterSchema,
     ItemSchema,
     MapSchema,
+    PendingItemSchema,
     RewardsSchema,
     SimpleItemSchema,
     TaskType,
@@ -213,6 +214,20 @@ class CharacterTransitionResponseSchema(BaseModel):
     """CharacterTransitionResponseSchema"""
 
     data: CharacterTransitionDataSchema
+
+
+class ClaimPendingItemDataSchema(BaseModel):
+    """Data schema for claim pending item action."""
+
+    cooldown: CooldownSchema
+    item: PendingItemSchema
+    character: CharacterSchema
+
+
+class ClaimPendingItemResponseSchema(BaseModel):
+    """Response schema for claim pending item action."""
+
+    data: ClaimPendingItemDataSchema
 
 
 class ItemSlot(str, Enum):

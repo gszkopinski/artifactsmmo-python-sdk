@@ -13,6 +13,7 @@ from ..models.actions import (
     CharacterMovementResponseSchema,
     CharacterRestResponseSchema,
     CharacterTransitionResponseSchema,
+    ClaimPendingItemResponseSchema,
     EquipmentResponseSchema,
     EquipSchema,
     GECreateOrderTransactionResponseSchema,
@@ -801,5 +802,30 @@ class Actions(BaseModule):
             json={
                 "items": items,
                 "character": character,
+            },
+        )
+
+    def claim_pending_item(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        id: Annotated[
+            str,
+            Field(
+                description="The ID of the pending item to claim.",
+                pattern="^[a-zA-Z0-9]+$",
+            ),
+        ],
+    ) -> tuple[str, ClaimPendingItemResponseSchema | None]:
+        """Claim a pending item with a specific character."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/claim_item/{id}",
+            ClaimPendingItemResponseSchema,
+            "Successfully claimed the pending item.",
+            {
+                404: "Pending item not found.",
             },
         )
