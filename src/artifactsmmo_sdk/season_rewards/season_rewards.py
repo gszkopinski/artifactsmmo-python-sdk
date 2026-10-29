@@ -36,3 +36,26 @@ class SeasonRewards(BaseModule):
                 "size": size,
             },
         )
+
+    def get_season_rewards_by_code(
+        self,
+        code: Annotated[
+            str,
+            Field(
+                description="The code of the season reward.", pattern="^[a-zA-Z0-9_-]+$"
+            ),
+        ],
+        page: Annotated[int, Field(description="Page number", ge=1)] = 1,
+        size: Annotated[int, Field(description="Page size", ge=1, le=10000)] = 50,
+    ) -> tuple[str, StaticDataPage_SeasonRewardSchema_ | None]:
+        """List all season rewards matching a specific code."""
+        return self._request(
+            "GET",
+            f"/season_rewards/{code}",
+            StaticDataPage_SeasonRewardSchema_,
+            "Successfully fetched season rewards.",
+            params={
+                "page": page,
+                "size": size,
+            },
+        )
