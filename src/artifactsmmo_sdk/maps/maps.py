@@ -10,6 +10,7 @@ from ..models.common import (
     MapLayer,
 )
 from ..models.maps import (
+    MapResponseSchema,
     StaticDataPage_MapSchema_,
 )
 
@@ -114,5 +115,27 @@ class Maps(BaseModule):
                 "transition": transition,
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_map(
+        self,
+        layer: Annotated[
+            MapLayer,
+            Field(
+                description="The layer of the map (interior, overworld, underground)."
+            ),
+        ],
+        x: Annotated[int, Field(description="The position x of the map.")],
+        y: Annotated[int, Field(description="The position y of the map.")],
+    ) -> tuple[str, MapResponseSchema | None]:
+        """Retrieve the details of a map by layer and coordinates."""
+        return self._request(
+            "GET",
+            f"/maps/{layer}/{x}/{y}",
+            MapResponseSchema,
+            "Successfully fetched map.",
+            {
+                404: "map not found.",
             },
         )
