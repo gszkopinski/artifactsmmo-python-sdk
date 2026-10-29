@@ -37,6 +37,12 @@ class EffectSchema(BaseModel):
     subtype: EffectSubtype
 
 
+class EffectResponseSchema(BaseModel):
+    """EffectResponseSchema"""
+
+    data: EffectSchema
+
+
 class StaticDataPage_EffectSchema_(BaseModel):
     """StaticDataPage[EffectSchema]"""
 

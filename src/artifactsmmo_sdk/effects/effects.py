@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ..base import BaseModule
 from ..models.effects import (
+    EffectResponseSchema,
     StaticDataPage_EffectSchema_,
 )
 
@@ -27,5 +28,23 @@ class Effects(BaseModule):
             params={
                 "page": page,
                 "size": size,
+            },
+        )
+
+    def get_effect(
+        self,
+        code: Annotated[
+            str,
+            Field(description="The code of the effect.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, EffectResponseSchema | None]:
+        """Retrieve the details of an effect."""
+        return self._request(
+            "GET",
+            f"/effects/{code}",
+            EffectResponseSchema,
+            "Successfully fetched effect.",
+            {
+                404: "effect not found.",
             },
         )
