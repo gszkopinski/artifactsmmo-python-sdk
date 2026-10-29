@@ -2,23 +2,14 @@
 
 from typing import Annotated
 
-import requests
 from pydantic import Field
 
+from ..base import BaseModule
 from ..models.monsters import ListMonsterResponseSchema, MonsterResponseSchema
 
 
-class Monsters:
+class Monsters(BaseModule):
     """Monsters."""
-
-    def __init__(
-        self,
-        api_url: str,
-        session: requests.Session,
-    ) -> None:
-        """Init."""
-        self.api_url = api_url
-        self.session = session
 
     def get_monster(
         self,
@@ -28,24 +19,15 @@ class Monsters:
         ],
     ) -> tuple[str, MonsterResponseSchema | None]:
         """Retrieve the details of a monster."""
-        try:
-            response = self.session.get(
-                url=f"{self.api_url}/monsters/{code}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched monster.",
-                MonsterResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 404:
-                    return "Monster not found.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            f"/monsters/{code}",
+            MonsterResponseSchema,
+            "Successfully fetched monster.",
+            {
+                404: "Monster not found.",
+            },
+        )
 
     def get_all_monsters(
         self,
@@ -60,27 +42,19 @@ class Monsters:
         ] = 50,
     ) -> tuple[str, ListMonsterResponseSchema | None]:
         """Fetch monsters details."""
-        try:
-            parameters = f"page={page}"
-            parameters += f"&size={size}"
-            parameters += f"&drop={drop}" if drop else ""
-            parameters += f"&max_level={max_level}" if max_level else ""
-            parameters += f"&min_level={min_level}" if min_level else ""
-
-            response = self.session.get(
-                url=f"{self.api_url}/monsters?{parameters}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched monsters details.",
-                ListMonsterResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 404:
-                    return "Monsters not found.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            "/monsters",
+            ListMonsterResponseSchema,
+            "Successfully fetched monsters details.",
+            {
+                404: "Monsters not found.",
+            },
+            params={
+                "page": page,
+                "size": size,
+                "drop": drop or None,
+                "max_level": max_level or None,
+                "min_level": min_level or None,
+            },
+        )

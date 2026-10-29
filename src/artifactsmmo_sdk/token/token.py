@@ -28,7 +28,6 @@ class Token:
         You can also generate your token directly on the website."""
         try:
             basic = b64encode(f"{username}:{password}".encode()).decode("UTF-8")
-            print("Basic:", basic)
 
             response = requests.post(
                 url=f"{self.api_url}/token",

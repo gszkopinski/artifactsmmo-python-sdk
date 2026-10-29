@@ -2,9 +2,9 @@
 
 from typing import Annotated
 
-import requests
 from pydantic import Field
 
+from ..base import BaseModule
 from ..models.account import (
     AccountDetailsResponseSchema,
     ChangePasswordResponseSchema,
@@ -15,41 +15,22 @@ from ..models.account import (
 )
 
 
-class Account:
+class Account(BaseModule):
     """Account."""
-
-    def __init__(
-        self,
-        api_url: str,
-        session: requests.Session,
-    ) -> None:
-        """Init."""
-        self.api_url = api_url
-        self.session = session
 
     # -----------------------------------------------------
     # BANK
     # -----------------------------------------------------
     def get_bank_details(
         self,
-    ) -> tuple[str, dict | None]:
+    ) -> tuple[str, ListBankDetailsResponseSchema | None]:
         """Fetch your bank details."""
-        try:
-            response = self.session.get(
-                url=f"{self.api_url}/my/bank",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched bank details.",
-                ListBankDetailsResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            "/my/bank",
+            ListBankDetailsResponseSchema,
+            "Successfully fetched bank details.",
+        )
 
     def get_bank_items(
         self,
@@ -65,26 +46,17 @@ class Account:
         ] = 50,
     ) -> tuple[str, ListBankItemsResponseSchema | None]:
         """Fetch all items in your bank."""
-        try:
-            parameters = f"item_code={item_code}"
-            parameters += f"&page={page}"
-            parameters += f"&size={size}"
-
-            response = self.session.get(
-                url=f"{self.api_url}/my/bank/items?{parameters}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched items.",
-                ListBankItemsResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            "/my/bank/items",
+            ListBankItemsResponseSchema,
+            "Successfully fetched items.",
+            params={
+                "item_code": item_code,
+                "page": page,
+                "size": size,
+            },
+        )
 
     # -----------------------------------------------------
     # GRAND EXCHANGE
@@ -100,26 +72,17 @@ class Account:
         ] = 50,
     ) -> tuple[str, GEOrderResponseSchema | None]:
         """Fetch your grand exchange sell orders."""
-        try:
-            parameters = f"code={item_code}"
-            parameters += f"&page={page}"
-            parameters += f"&size={size}"
-
-            response = self.session.get(
-                url=f"{self.api_url}/my/grandexchange/orders?{parameters}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched grand exchange sell orders.",
-                GEOrderResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            "/my/grandexchange/orders",
+            GEOrderResponseSchema,
+            "Successfully fetched grand exchange sell orders.",
+            params={
+                "code": item_code,
+                "page": page,
+                "size": size,
+            },
+        )
 
     def get_ge_sell_history(
         self,
@@ -143,27 +106,18 @@ class Account:
         ] = 50,
     ) -> tuple[str, GEOrderHistoryResponseSchema | None]:
         """Fetch your grand exchange order history."""
-        try:
-            parameters = f"code={item_code}"
-            parameters += f"&id={id}"
-            parameters += f"&page={page}"
-            parameters += f"&size={size}"
-
-            response = self.session.get(
-                url=f"{self.api_url}/my/grandexchange/history?{parameters}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched data.",
-                GEOrderHistoryResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            "/my/grandexchange/history",
+            GEOrderHistoryResponseSchema,
+            "Successfully fetched data.",
+            params={
+                "code": item_code,
+                "id": id,
+                "page": page,
+                "size": size,
+            },
+        )
 
     # -----------------------------------------------------
     # ACCOUNT
@@ -172,22 +126,12 @@ class Account:
         self,
     ) -> tuple[str, AccountDetailsResponseSchema | None]:
         """Fetch your account details."""
-        try:
-            response = self.session.get(
-                url=f"{self.api_url}/my/details",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched account details.",
-                AccountDetailsResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            "/my/details",
+            AccountDetailsResponseSchema,
+            "Successfully fetched account details.",
+        )
 
     # -----------------------------------------------------
     # PASSWORD
@@ -202,32 +146,17 @@ class Account:
         ],
     ) -> tuple[str, ChangePasswordResponseSchema | None]:
         """Change your account password. Changing the password reset the account token."""
-        try:
-            response = self.session.post(
-                url=f"{self.api_url}/my/change_password",
-                json={
-                    "current_password": current_password,
-                    "new_password": new_password,
-                },
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Password changed successfully.",
-                ChangePasswordResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 422:
-                    return (
-                        "Request could not be processed due to an invalid payload.",
-                        None,
-                    )
-                case 458:
-                    return "Use a different password.", None
-                case 459:
-                    return "The current password you entered is invalid.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "POST",
+            "/my/change_password",
+            ChangePasswordResponseSchema,
+            "Password changed successfully.",
+            {
+                458: "Use a different password.",
+                459: "The current password you entered is invalid.",
+            },
+            json={
+                "current_password": current_password,
+                "new_password": new_password,
+            },
+        )

@@ -2,23 +2,14 @@
 
 from typing import Annotated
 
-import requests
 from pydantic import Field
 
+from ..base import BaseModule
 from ..models.accounts import AccountsResponseSchema
 
 
-class Accounts:
+class Accounts(BaseModule):
     """Accounts."""
-
-    def __init__(
-        self,
-        api_url: str,
-        session: requests.Session,
-    ) -> None:
-        """Init."""
-        self.api_url = api_url
-        self.session = session
 
     def create_account(
         self,
@@ -48,33 +39,18 @@ class Accounts:
         ],
     ) -> tuple[str, AccountsResponseSchema | None]:
         """Create new account."""
-        try:
-            response = self.session.post(
-                url=f"{self.api_url}/accounts/create",
-                json={
-                    "username": username,
-                    "password": password,
-                    "email": email,
-                },
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Account created successfully.",
-                AccountsResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 422:
-                    return (
-                        "Request could not be processed due to an invalid payload.",
-                        None,
-                    )
-                case 456:
-                    return "This username is already taken.", None
-                case 457:
-                    return "This email is already in use.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "POST",
+            "/accounts/create",
+            AccountsResponseSchema,
+            "Account created successfully.",
+            {
+                456: "This username is already taken.",
+                457: "This email is already in use.",
+            },
+            json={
+                "username": username,
+                "password": password,
+                "email": email,
+            },
+        )

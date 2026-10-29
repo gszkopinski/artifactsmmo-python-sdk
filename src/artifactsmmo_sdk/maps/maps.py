@@ -2,23 +2,14 @@
 
 from typing import Annotated
 
-import requests
 from pydantic import Field
 
+from ..base import BaseModule
 from ..models.maps import ListMapResponseSchema, MapContentTypeSchema, MapResponseSchema
 
 
-class Maps:
+class Maps(BaseModule):
     """Maps."""
-
-    def __init__(
-        self,
-        api_url: str,
-        session: requests.Session,
-    ) -> None:
-        """Init."""
-        self.api_url = api_url
-        self.session = session
 
     def get_map(
         self,
@@ -26,24 +17,15 @@ class Maps:
         y: Annotated[int, Field(description="The position Y of the map.")],
     ) -> tuple[str, MapResponseSchema | None]:
         """Retrieve the details of a map."""
-        try:
-            response = self.session.get(
-                url=f"{self.api_url}/maps/{x}/{y}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched map.",
-                MapResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 404:
-                    return "Map not found.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            f"/maps/{x}/{y}",
+            MapResponseSchema,
+            "Successfully fetched map.",
+            {
+                404: "Map not found.",
+            },
+        )
 
     def get_all_maps(
         self,
@@ -64,26 +46,18 @@ class Maps:
         ] = 50,
     ) -> tuple[str, ListMapResponseSchema | None]:
         """Fetch maps details."""
-        try:
-            parameters = f"page={page}"
-            parameters += f"&size={size}"
-            parameters += f"&content_code={content_code}" if content_code else ""
-            parameters += f"&content_type={content_type}" if content_type else ""
-
-            response = self.session.get(
-                url=f"{self.api_url}/maps?{parameters}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched maps details.",
-                ListMapResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 404:
-                    return "Maps not found.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            "/maps",
+            ListMapResponseSchema,
+            "Successfully fetched maps details.",
+            {
+                404: "Maps not found.",
+            },
+            params={
+                "page": page,
+                "size": size,
+                "content_code": content_code or None,
+                "content_type": content_type or None,
+            },
+        )

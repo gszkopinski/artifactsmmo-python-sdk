@@ -1,21 +1,11 @@
 """Server."""
 
-import requests
-
+from ..base import BaseModule
 from ..models.server import StatusResponseSchema
 
 
-class Server:
+class Server(BaseModule):
     """Server."""
-
-    def __init__(
-        self,
-        api_url: str,
-        session: requests.Session,
-    ) -> None:
-        """Init."""
-        self.api_url = api_url
-        self.session = session
 
     def status(
         self,

@@ -2,23 +2,14 @@
 
 from typing import Annotated
 
-import requests
 from pydantic import Field
 
+from ..base import BaseModule
 from ..models.events import ListActiveEventResponseSchema
 
 
-class Events:
+class Events(BaseModule):
     """Events."""
-
-    def __init__(
-        self,
-        api_url: str,
-        session: requests.Session,
-    ) -> None:
-        """Init."""
-        self.api_url = api_url
-        self.session = session
 
     def get_all_active_events(
         self,
@@ -28,24 +19,16 @@ class Events:
         ] = 50,
     ) -> tuple[str, ListActiveEventResponseSchema | None]:
         """Fetch events details."""
-        try:
-            parameters = f"page={page}"
-            parameters += f"&size={size}"
-
-            response = self.session.get(
-                url=f"{self.api_url}/events/active?{parameters}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched events details.",
-                ListActiveEventResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 404:
-                    return "Events not found..", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            "/events/active",
+            ListActiveEventResponseSchema,
+            "Successfully fetched events details.",
+            {
+                404: "Events not found..",
+            },
+            params={
+                "page": page,
+                "size": size,
+            },
+        )

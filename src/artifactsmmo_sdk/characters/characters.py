@@ -2,9 +2,9 @@
 
 from typing import Annotated
 
-import requests
 from pydantic import Field
 
+from ..base import BaseModule
 from ..models.characters import (
     CharacterResponseSchema,
     CharacterSkinEnum,
@@ -13,17 +13,8 @@ from ..models.characters import (
 )
 
 
-class Characters:
+class Characters(BaseModule):
     """Characters."""
-
-    def __init__(
-        self,
-        api_url: str,
-        session: requests.Session,
-    ) -> None:
-        """Init."""
-        self.api_url = api_url
-        self.session = session
 
     def create_character(
         self,
@@ -39,27 +30,17 @@ class Characters:
         skin: Annotated[CharacterSkinEnum, Field(description="Your desired skin.")],
     ) -> tuple[str, CharacterResponseSchema | None]:
         """Create new character on your account. You can create up to 5 characters."""
-        try:
-            response = self.session.post(
-                url=f"{self.api_url}/characters/create",
-                json={"name": name, "skin": skin},
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully created character.",
-                CharacterResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 494:
-                    return "Name already used.", None
-                case 495:
-                    return "Maximum characters reached on your account.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "POST",
+            "/characters/create",
+            CharacterResponseSchema,
+            "Successfully created character.",
+            {
+                494: "Name already used.",
+                495: "Maximum characters reached on your account.",
+            },
+            json={"name": name, "skin": skin},
+        )
 
     def delete_character(
         self,
@@ -74,25 +55,13 @@ class Characters:
         ],
     ) -> tuple[str, CharacterResponseSchema | None]:
         """Delete character on your account."""
-        try:
-            response = self.session.post(
-                url=f"{self.api_url}/characters/delete",
-                json={"name": name},
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully deleted character.",
-                CharacterResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 498:
-                    return "Character not found.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "POST",
+            "/characters/delete",
+            CharacterResponseSchema,
+            "Successfully deleted character.",
+            json={"name": name},
+        )
 
     def get_all_characters(
         self,
@@ -109,49 +78,32 @@ class Characters:
         ] = 50,
     ) -> tuple[str, ListCharacterResponseSchema | None]:
         """Fetch characters details."""
-        try:
-            parameters = f"sort={sort}"
-            parameters += f"&page={page}"
-            parameters += f"&size={size}"
-
-            response = self.session.get(
-                url=f"{self.api_url}/characters?{parameters}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched characters details.",
-                ListCharacterResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 404:
-                    return "Characters not found.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            "/characters",
+            ListCharacterResponseSchema,
+            "Successfully fetched characters details.",
+            {
+                404: "Characters not found.",
+            },
+            params={
+                "sort": sort,
+                "page": page,
+                "size": size,
+            },
+        )
 
     def get_character(
         self,
         name: str,
     ) -> tuple[str, CharacterResponseSchema | None]:
         """Retrieve the details of a character."""
-        try:
-            response = self.session.get(
-                url=f"{self.api_url}/characters/{name}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched character.",
-                CharacterResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 404:
-                    return "Character not found.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            f"/characters/{name}",
+            CharacterResponseSchema,
+            "Successfully fetched character.",
+            {
+                404: "Character not found.",
+            },
+        )

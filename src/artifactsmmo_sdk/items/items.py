@@ -2,9 +2,9 @@
 
 from typing import Annotated
 
-import requests
 from pydantic import Field
 
+from ..base import BaseModule
 from ..models.items import (
     CraftSkillEnum,
     ListItemsResponseSchema,
@@ -13,17 +13,8 @@ from ..models.items import (
 )
 
 
-class Items:
+class Items(BaseModule):
     """Items."""
-
-    def __init__(
-        self,
-        api_url: str,
-        session: requests.Session,
-    ) -> None:
-        """Init."""
-        self.api_url = api_url
-        self.session = session
 
     def get_item(
         self,
@@ -32,24 +23,15 @@ class Items:
         ],
     ) -> tuple[str, SingleItemResponseSchema | None]:
         """Retrieve the details of a item."""
-        try:
-            response = self.session.get(
-                url=f"{self.api_url}/items/{code}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Successfully fetched item.",
-                SingleItemResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 404:
-                    return "Item not found.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            f"/items/{code}",
+            SingleItemResponseSchema,
+            "Successfully fetched item.",
+            {
+                404: "Item not found.",
+            },
+        )
 
     def get_all_items(
         self,
@@ -77,30 +59,22 @@ class Items:
         ] = 50,
     ) -> tuple[str, ListItemsResponseSchema | None]:
         """Fetch items details."""
-        try:
-            parameters = f"page={page}"
-            parameters += f"&size={size}"
-            parameters += f"&type={type_item}"
-            parameters += f"&craft_material={craft_material}" if craft_material else ""
-            parameters += f"&craft_skill={craft_skill}" if craft_skill else ""
-            parameters += f"&max_level={max_level}" if max_level else ""
-            parameters += f"&min_level={min_level}" if min_level else ""
-            parameters += f"&name={name}" if name else ""
-
-            response = self.session.get(
-                url=f"{self.api_url}/items?{parameters}",
-            )
-
-            response.raise_for_status()
-
-            return (
-                "Fetch items details.",
-                ListItemsResponseSchema.model_validate(response.json()),
-            )
-
-        except requests.exceptions.HTTPError as error:
-            match error.response.status_code:
-                case 404:
-                    return "Monsters not found.", None
-                case _:
-                    return f"Unknown error: {error}", None
+        return self._request(
+            "GET",
+            "/items",
+            ListItemsResponseSchema,
+            "Fetch items details.",
+            {
+                404: "Monsters not found.",
+            },
+            params={
+                "page": page,
+                "size": size,
+                "type": type_item,
+                "craft_material": craft_material or None,
+                "craft_skill": craft_skill or None,
+                "max_level": max_level or None,
+                "min_level": min_level or None,
+                "name": name or None,
+            },
+        )
