@@ -1,4 +1,4 @@
-"""Init Grand Excahnge."""
+"""Init GrandExchange."""
 
 from .grand_exchange import GrandExchange
 
