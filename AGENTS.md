@@ -12,8 +12,8 @@ This document outlines the strategy for using AI agents to enhance the developme
 - **Implementation**:
   - Use agents to analyze the existing test suite (unit tests in `tests/`, live tests in `tests/live/`) and identify gaps.
   - Automatically generate tests for new endpoints based on schema definitions (e.g., `src/artifactsmmo_sdk/models/actions.py`, `src/artifactsmmo_sdk/models/characters.py`).
-  - Unit tests mock the HTTP layer with **pytest-mock** (`mocker`), never `unittest`. Use the `client` and `respond` fixtures from `tests/conftest.py`; `tests/test_modules.py` holds one entry per endpoint (verb + path).
-  - Live tests (`tests/live/`, marker `live`) hit the real API and only run with `pytest -m live` and `TOKEN`/`API_URL` set.
+  - Unit tests mock the HTTP layer with **pytest-mock** (`mocker`), never `unittest`. Use the `client` and `respond` fixtures from `tests/conftest.py`; Each module has its own `tests/test_<module>.py` with a success test and an error test per endpoint (verb, URL, params and body are asserted).
+  - Live tests (`tests/live/`, marker `live`) are read-only smoke tests of the real API; they only run with `pytest -m live` and `TOKEN`/`API_URL` set.
   - Example: Use agent to create tests for new `TaskRewardSchema` or `BankItemSchema` endpoints.
 
 ### 2. **Code Generation**
@@ -31,6 +31,7 @@ This document outlines the strategy for using AI agents to enhance the developme
 ### 4. **Refactoring**
 - **Task**: Improve code structure and maintainability by refactoring existing code.
 - **Implementation**:
+  - The SDK follows the official OpenAPI spec (https://api.artifactsmmo.com/openapi.json, v8.2.4). `uv run python scripts/check_openapi.py` diffs the SDK against it (paths, parameters, errors, model fields) and must report no gap. One commit per endpoint added or changed.
   - Request, error mapping, timeout and 429 retry are centralised in `src/artifactsmmo_sdk/base.py` (`BaseModule._request`, `COMMON_ERRORS`, `build_session`). New endpoints must use `_request` and only declare their endpoint-specific error codes.
   - Example: Cooldowns are only reported (HTTP 499 -> "Character in cooldown."), there is no waiting logic yet; a `handle_cooldown` helper would belong in `base.py`.
 
@@ -77,7 +78,7 @@ This document outlines the strategy for using AI agents to enhance the developme
 ---
 
 ## Project Structure
-- **Main Client**: `src/artifactsmmo_sdk/client.py` builds the shared session and initializes modules like `Account`, `Actions`, `Characters`, etc. (`grand_exchange` is not wired yet).
+- **Main Client**: `src/artifactsmmo_sdk/client.py` builds the shared session and initializes modules like `Account`, `Actions`, `Characters`, etc. (one attribute per API tag: `server`, `account`, `actions`, `grand_exchange`, `npcs`, `raids`, `gems_shop`, ...). `POST /token` stays hand-written in `token/token.py` (HTTP Basic auth).
 - **Modules**: Each module (e.g., `src/artifactsmmo_sdk/actions/actions.py`, `src/artifactsmmo_sdk/characters/characters.py`) handles specific API endpoints.
 - **Tests**: Unit tests in `tests/` (`test_base.py`, `test_modules.py`), live tests in `tests/live/`, run with pytest.
 - **Models**: Data models and enums (e.g., `SlotEnum` in `src/artifactsmmo_sdk/models/actions.py`) are used for schema validation and type hints.

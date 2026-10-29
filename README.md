@@ -25,6 +25,8 @@ if result is None:
     print(message)  # e.g. "Character in cooldown."
 ```
 
+The SDK covers the whole Artifacts API (v8.2.4): `client.server`, `account`, `accounts`, `characters`, `actions`, `grand_exchange`, `items`, `monsters`, `resources`, `maps`, `events`, `effects`, `npcs`, `tasks`, `achievements`, `badges`, `skins`, `season_rewards`, `leaderboard`, `raids`, `simulation`, `gems_shop`, `game_assistant`.
+
 Every endpoint returns `(message, data)`. `data` is `None` when the call failed
 and `message` tells why. Requests have a 30 s timeout and are retried on HTTP 429.
 
@@ -33,6 +35,7 @@ and `message` tells why. Requests have a 30 s timeout and are retried on HTTP 42
 ```bash
 uv sync
 uv run pytest                 # unit tests, no network
-uv run pytest -m live         # hits the real API, needs TOKEN and API_URL
+uv run pytest -m live         # read-only calls on the real API, needs TOKEN and API_URL
+uv run python scripts/check_openapi.py   # diff the SDK against the OpenAPI spec
 uv run ruff check . && uv run mypy src
 ```
