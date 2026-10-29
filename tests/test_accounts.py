@@ -195,3 +195,28 @@ def test_forgot_password_error(client, respond):
         "Request could not be processed due to an invalid payload.",
         None,
     )
+
+
+def test_reset_password(client, respond):
+    respond(200, {"message": "x"})
+    message, data = client.accounts.reset_password(token="x", new_password="x")
+    assert (message, data is not None) == (
+        "Password has been successfully reset.",
+        True,
+    )
+    assert client.session.request.call_args.args == (
+        "POST",
+        "http://api.test/accounts/reset_password",
+    )
+    assert client.session.request.call_args.kwargs["json"] == {
+        "token": "x",
+        "new_password": "x",
+    }
+
+
+def test_reset_password_error(client, respond):
+    respond(560)
+    assert client.accounts.reset_password(token="x", new_password="x") == (
+        "The password reset token is invalid.",
+        None,
+    )

@@ -107,3 +107,27 @@ class Accounts(BaseModule):
                 "email": email,
             },
         )
+
+    def reset_password(
+        self,
+        token: Annotated[str, Field(description="Password reset token.")],
+        new_password: Annotated[
+            str, Field(description="Your new password.", pattern="^[^\\s]+$")
+        ],
+    ) -> tuple[str, PasswordResetResponseSchema | None]:
+        """Reset password with a token. Use /forgot_password to get a token by email."""
+        return self._request(
+            "POST",
+            "/accounts/reset_password",
+            PasswordResetResponseSchema,
+            "Password has been successfully reset.",
+            {
+                560: "The password reset token is invalid.",
+                561: "The password reset token has expired.",
+                562: "This password reset token has already been used.",
+            },
+            json={
+                "token": token,
+                "new_password": new_password,
+            },
+        )
