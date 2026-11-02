@@ -42,7 +42,7 @@ executing==2.2.1
     # via
     #   icecream
     #   stack-data
-filelock==4.0.6
+filelock==4.2.1
     # via
     #   python-discovery
     #   virtualenv
