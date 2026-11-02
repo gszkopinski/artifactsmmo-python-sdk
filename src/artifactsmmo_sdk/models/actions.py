@@ -53,6 +53,7 @@ class ActionType(str, Enum):
     RENAME = "rename"
     TRANSITION = "transition"
     CLAIM_ITEM = "claim_item"
+    OFFERING = "offering"
     SANDBOX_GIVE_GOLD = "sandbox_give_gold"
     SANDBOX_GIVE_ITEM = "sandbox_give_item"
     SANDBOX_GIVE_XP = "sandbox_give_xp"

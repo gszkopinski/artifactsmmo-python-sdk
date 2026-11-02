@@ -38,6 +38,11 @@ from ..models.actions import (
 from ..models.common import (
     SimpleItemSchema,
 )
+from ..models.seasonal_offerings import (
+    AcceptOfferingResponseSchema,
+    CharacterSeasonalOfferingsResponseSchema,
+    CompleteOfferingResponseSchema,
+)
 
 
 class Actions(BaseModule):
@@ -188,6 +193,7 @@ class Actions(BaseModule):
             "The item has been successfully used.",
             {
                 404: "Item not found.",
+                403: "Commercial features are disabled on sandbox and beta servers.",
                 476: "This item is not a consumable.",
                 496: "Conditions not met.",
             },
@@ -967,4 +973,76 @@ class Actions(BaseModule):
             "/my/characters",
             MyCharactersListSchema,
             "Successfully fetched data.",
+        )
+
+    def get_character_seasonal_offerings(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, CharacterSeasonalOfferingsResponseSchema | None]:
+        """Return today's offerings and completion state for one character."""
+        return self._request(
+            "GET",
+            f"/my/{name}/offerings",
+            CharacterSeasonalOfferingsResponseSchema,
+            "Successfully fetched seasonal offerings.",
+            {
+                498: "Character not found.",
+                575: "This seasonal offering is not available.",
+            },
+        )
+
+    def accept_seasonal_offering(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        offering_id: Annotated[
+            str,
+            Field(description="Offering identifier.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, AcceptOfferingResponseSchema | None]:
+        """Accept one offering in a daily category and activate its favor."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/offering/accept",
+            AcceptOfferingResponseSchema,
+            "The offering has been accepted.",
+            {
+                574: "The character has already completed an offering in this category today.",
+                575: "This seasonal offering is not available.",
+                576: "The character has already selected an offering in this category today.",
+                598: "Seasonal Altar not found on this map.",
+            },
+            json={"offering_id": offering_id},
+        )
+
+    def complete_seasonal_offering(
+        self,
+        name: Annotated[
+            str,
+            Field(description="Name of your character.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+        offering_id: Annotated[
+            str,
+            Field(description="Offering identifier.", pattern="^[a-zA-Z0-9_-]+$"),
+        ],
+    ) -> tuple[str, CompleteOfferingResponseSchema | None]:
+        """Complete a previously accepted offering and receive its XP reward."""
+        return self._request(
+            "POST",
+            f"/my/{name}/action/offering",
+            CompleteOfferingResponseSchema,
+            "The offering has been completed.",
+            {
+                478: "Missing required item(s).",
+                574: "The character has already completed an offering in this category today.",
+                575: "This seasonal offering is not available.",
+                577: "The character must accept this seasonal offering first.",
+                598: "Seasonal Altar not found on this map.",
+            },
+            json={"offering_id": offering_id},
         )

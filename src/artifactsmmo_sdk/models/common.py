@@ -76,6 +76,7 @@ class AchievementType(str, Enum):
     CRAFTING = "crafting"
     RECYCLING = "recycling"
     TASK = "task"
+    FAVOR = "favor"
     OTHER = "other"
     USE = "use"
     NPC_BUY = "npc_buy"
@@ -91,6 +92,7 @@ class MapContentType(str, Enum):
     BANK = "bank"
     GRAND_EXCHANGE = "grand_exchange"
     TASKS_MASTER = "tasks_master"
+    SEASONAL_ALTAR = "seasonal_altar"
     NPC = "npc"
     RAID = "raid"
 

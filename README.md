@@ -25,7 +25,7 @@ if result is None:
     print(message)  # e.g. "Character in cooldown."
 ```
 
-The SDK covers the whole Artifacts API (v8.2.4): `client.server`, `account`, `accounts`, `characters`, `actions`, `grand_exchange`, `items`, `monsters`, `resources`, `maps`, `events`, `effects`, `npcs`, `tasks`, `achievements`, `badges`, `skins`, `season_rewards`, `leaderboard`, `raids`, `simulation`, `gems_shop`, `game_assistant`.
+The SDK covers the whole Artifacts API (v9.0.0): `client.server`, `account`, `accounts`, `characters`, `actions`, `grand_exchange`, `items`, `monsters`, `resources`, `maps`, `events`, `effects`, `npcs`, `tasks`, `achievements`, `badges`, `skins`, `season_rewards`, `leaderboard`, `raids`, `simulation`, `gems_shop`, `game_assistant`, `seasonal_offerings`.
 
 Every endpoint returns `(message, data)`. `data` is `None` when the call failed
 and `message` tells why. Requests have a 30 s timeout and are retried on HTTP 429.
