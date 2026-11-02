@@ -24,6 +24,7 @@ from .npcs import Npcs
 from .raids import Raids
 from .resources import Resources
 from .season_rewards import SeasonRewards
+from .seasonal_offerings import SeasonalOfferings
 from .server import Server
 from .simulation import Simulation
 from .skins import Skins
@@ -73,6 +74,9 @@ class ArtifactsClient:
         self.raids = Raids(api_url=self.api_url, session=self.session)
         self.resources = Resources(api_url=self.api_url, session=self.session)
         self.season_rewards = SeasonRewards(api_url=self.api_url, session=self.session)
+        self.seasonal_offerings = SeasonalOfferings(
+            api_url=self.api_url, session=self.session
+        )
         self.server = Server(api_url=self.api_url, session=self.session)
         self.simulation = Simulation(api_url=self.api_url, session=self.session)
         self.skins = Skins(api_url=self.api_url, session=self.session)

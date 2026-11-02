@@ -31,7 +31,7 @@ This document outlines the strategy for using AI agents to enhance the developme
 ### 4. **Refactoring**
 - **Task**: Improve code structure and maintainability by refactoring existing code.
 - **Implementation**:
-  - The SDK follows the official OpenAPI spec (https://api.artifactsmmo.com/openapi.json, v8.2.4). `uv run python scripts/check_openapi.py` diffs the SDK against it (paths, parameters, errors, model fields) and must report no gap. One commit per endpoint added or changed.
+  - The SDK follows the official OpenAPI spec (https://api.artifactsmmo.com/openapi.json, v9.0.0). `uv run python scripts/check_openapi.py` diffs the SDK against it (paths, parameters, errors, model fields) and must report no gap. One commit per endpoint added or changed.
   - Request, error mapping, timeout and 429 retry are centralised in `src/artifactsmmo_sdk/base.py` (`BaseModule._request`, `COMMON_ERRORS`, `build_session`). New endpoints must use `_request` and only declare their endpoint-specific error codes.
   - Example: Cooldowns are only reported (HTTP 499 -> "Character in cooldown."), there is no waiting logic yet; a `handle_cooldown` helper would belong in `base.py`.
 
